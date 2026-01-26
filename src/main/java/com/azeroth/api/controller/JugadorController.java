@@ -46,7 +46,7 @@ public class JugadorController {
     }
 
     @PutMapping("/hermandad/{id}")
-    public ResponseEntity<JugadorResponse> asignarHermandad(@PathVariable Long id, @RequestParam @Valid JugadorHermandadRequest request) {
+    public ResponseEntity<JugadorResponse> asignarHermandad(@PathVariable Long id, @RequestBody @Valid JugadorHermandadRequest request) {
         return jugadorService.asignarHermandad(id, request)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());

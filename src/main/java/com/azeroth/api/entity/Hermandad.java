@@ -35,6 +35,4 @@ public class Hermandad {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "faccion_id", nullable = false)
     private Faccion faccion;
-
-
 }
