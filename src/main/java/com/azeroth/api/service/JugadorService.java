@@ -1,5 +1,7 @@
 package com.azeroth.api.service;
 
+import com.azeroth.api.dto.JugadorEditarRequest;
+import com.azeroth.api.dto.JugadorHermandadRequest;
 import com.azeroth.api.dto.JugadorRequest;
 import com.azeroth.api.dto.JugadorResponse;
 import com.azeroth.api.entity.*;
@@ -73,19 +75,19 @@ public class JugadorService {
         jugadorRepository.deleteById(id);
     }
 
-    public Optional<JugadorResponse> editar(Long jugadorId, String nombre) {
-        Jugador jugador = jugadorRepository.findById(jugadorId)
-                .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + jugadorId));
-        jugador.setNombre(nombre);
+    public Optional<JugadorResponse> editar(Long idJugador, JugadorEditarRequest request) {
+        Jugador jugador = jugadorRepository.findById(idJugador)
+                .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + idJugador));
+        jugador.setNombre(request.nombre());
         Jugador jugadorActualizado = jugadorRepository.save(jugador);
         return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorActualizado));
     }
 
-    public Optional<JugadorResponse> asignarHermandad(Long jugadorId, Long hermandadId) {
-        Jugador jugador = jugadorRepository.findById(jugadorId)
-                .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + jugadorId));
-        Hermandad hermandad = hermandadRepository.findById(hermandadId)
-                .orElseThrow(() -> new RuntimeException("Hermandad no encontrada con id: " + hermandadId));
+    public Optional<JugadorResponse> asignarHermandad(Long idJugador, JugadorHermandadRequest request) {
+        Jugador jugador = jugadorRepository.findById(idJugador)
+                .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + idJugador));
+        Hermandad hermandad = hermandadRepository.findById(request.hermandadId())
+                .orElseThrow(() -> new RuntimeException("Hermandad no encontrada con id: " + request.hermandadId()));
 
         if(!jugador.getFaccion().getId().equals(hermandad.getFaccion().getId())) {
             throw new RuntimeException(
@@ -93,6 +95,7 @@ public class JugadorService {
                             jugador.getNombre(), hermandad.getNombre())
             );
         }
+
         jugador.setHermandad(hermandad);
         Jugador jugadorActualizado = jugadorRepository.save(jugador);
         return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorActualizado));
