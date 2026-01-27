@@ -7,7 +7,6 @@ import java.util.List;
 
 public record HermandadResponse(
         String nombre,
-        String descripcion,
         Reino reino,
         Facciones faccion,
         List<JugadorResponse> jugadores

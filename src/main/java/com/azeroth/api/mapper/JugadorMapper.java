@@ -12,7 +12,7 @@ public interface JugadorMapper {
     @Mapping(target = "clase", expression = "java(jugador.getClase() != null ? jugador.getClase().getNombre() : null)")
     @Mapping(target = "raza", expression = "java(jugador.getRaza() != null ? jugador.getRaza().getNombre() : null)")
     @Mapping(target = "faccion", expression = "java(jugador.getFaccion() != null ? jugador.getFaccion().getNombre() : null)")
-    @Mapping(target = "idHermandad", expression = "java(jugador.getHermandad() != null ? jugador.getHermandad().getId() : null)")
+    @Mapping(target = "hermandad", expression = "java(jugador.getHermandad() != null ? jugador.getHermandad().getNombre() : null)")
     JugadorResponse jugadorToJugadorResponse(Jugador jugador);
 
     @Mapping(target = "id", ignore = true)
