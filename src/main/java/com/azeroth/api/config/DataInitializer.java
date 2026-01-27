@@ -2,12 +2,14 @@ package com.azeroth.api.config;
 
 import com.azeroth.api.entity.Clase;
 import com.azeroth.api.entity.Faccion;
+import com.azeroth.api.entity.Logros;
 import com.azeroth.api.entity.Raza;
 import com.azeroth.api.enums.Clases;
 import com.azeroth.api.enums.Facciones;
 import com.azeroth.api.enums.Razas;
 import com.azeroth.api.repository.IClaseRepository;
 import com.azeroth.api.repository.IFaccionRepository;
+import com.azeroth.api.repository.ILogroRepository;
 import com.azeroth.api.repository.IRazaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,6 +93,64 @@ public class DataInitializer {
             } else {
                 logger.info("Los datos base de razas ya existen, omitiendo inicialización");
             }
+        };
+    }
+
+    @Bean
+    CommandLineRunner initLogros(ILogroRepository logroRepository) {
+        return args -> {
+            if (logroRepository.count() == 0) {
+                logroRepository.saveAll(List.of(
+                        Logros.builder()
+                                .titulo("Primer Paso")
+                                .descripcion("Alcanza el nivel 10")
+                                .puntosDeLogro(10)
+                                .valorObjetivo(10)
+                                .build(),
+                        Logros.builder()
+                                .titulo("Héroe Novato")
+                                .descripcion("Completa 5 misiones")
+                                .puntosDeLogro(25)
+                                .valorObjetivo(5)
+                                .build(),
+                        Logros.builder()
+                                .titulo("Guerrero Experimentado")
+                                .descripcion("Alcanza el nivel 50")
+                                .puntosDeLogro(50)
+                                .valorObjetivo(50)
+                                .build(),
+                        Logros.builder()
+                                .titulo("Maestro de Hermandades")
+                                .descripcion("Únete a una hermandad y participa en 10 eventos")
+                                .puntosDeLogro(75)
+                                .build(),
+                        Logros.builder()
+                                .titulo("Leyenda de Azeroth")
+                                .descripcion("Alcanza el nivel máximo")
+                                .puntosDeLogro(100)
+                                .valorObjetivo(70)
+                                .build(),
+                        Logros.builder()
+                                .titulo("Cazador de Tesoros")
+                                .descripcion("Encuentra 20 objetos épicos")
+                                .puntosDeLogro(40)
+                                .valorObjetivo(20)
+                                .build(),
+                        Logros.builder()
+                                .titulo("Defensor del Reino")
+                                .descripcion("Gana 100 combates PvP")
+                                .puntosDeLogro(60)
+                                .valorObjetivo(100)
+                                .build(),
+                        Logros.builder()
+                                .titulo("Explorador")
+                                .descripcion("Visita todas las zonas del mapa")
+                                .puntosDeLogro(35)
+                                .build()
+                ));
+                logger.info("Datos base de logros cargados exitosamente");
+            }
+            logger.info("Los datos base de logros ya existen, omitiendo inicialización");
         };
     }
 

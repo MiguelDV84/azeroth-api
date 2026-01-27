@@ -100,4 +100,12 @@ public class JugadorService {
         Jugador jugadorActualizado = jugadorRepository.save(jugador);
         return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorActualizado));
     }
+
+    public Optional<JugadorResponse> eliminarHermandad(Long idJugador) {
+        Jugador jugador = jugadorRepository.findById(idJugador)
+                .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + idJugador));
+        jugador.setHermandad(null);
+        Jugador jugadorActualizado = jugadorRepository.save(jugador);
+        return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorActualizado));
+    }
 }

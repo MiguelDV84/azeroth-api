@@ -42,4 +42,18 @@ public class HermandadService {
                 .map(hermandadMapper::hermandadToHermandadResponse)
                 .toList();
     }
+
+    public Optional<HermandadResponse> editar(Long id, HermandadRequest request) {
+        Hermandad hermandad = hermandadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Hermandad no encontrada con id: " + id));
+        hermandad.setNombre(request.nombre());
+
+        Hermandad hermandadEditada = hermandadRepository.save(hermandad);
+        return Optional.of(hermandadMapper.hermandadToHermandadResponse(hermandadEditada));
+    }
+
+    public void eliminar(Long id) {
+        hermandadRepository.deleteById(id);
+    }
+
 }

@@ -36,4 +36,17 @@ public class HermandadController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<HermandadResponse> editarHermandad(@PathVariable Long id, @RequestBody @Valid HermandadRequest request) {
+        return hermandadService.editar(id, request)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarHermandad(@PathVariable Long id) {
+        hermandadService.eliminar(id);
+        return ResponseEntity.noContent().build();
+    }
 }

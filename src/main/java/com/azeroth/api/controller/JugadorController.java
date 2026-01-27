@@ -52,6 +52,15 @@ public class JugadorController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+    @PutMapping("/remover-hermandad/{id}")
+    public ResponseEntity<JugadorResponse> removerHermandad(@PathVariable Long id) {
+        return jugadorService.eliminarHermandad(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarJugador(@PathVariable Long id) {
         jugadorService.eliminar(id);

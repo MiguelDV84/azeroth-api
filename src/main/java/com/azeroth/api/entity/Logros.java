@@ -26,8 +26,6 @@ public class Logros {
     @Column(name = "puntos_de_logro", nullable = false)
     private int puntosDeLogro;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "expansion_id", nullable = false)
-    private Expansion expansion;
-
+    @Column(name = "valor_objetivo", nullable = false)
+    private int valorObjetivo;
 }
