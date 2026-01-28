@@ -164,25 +164,23 @@ public class DataInitializer {
     private List<Clase> obtenerClasesParaRaza(Razas raza, IClaseRepository claseRepository) {
         List<Clases> clasesEnum = switch (raza) {
             case HUMANO -> List.of(Clases.GUERRERO, Clases.PALADIN, Clases.MAGO, Clases.SACERDOTE,
-                                   Clases.PICARO, Clases.BRUJO, Clases.CABALLERO_DE_LA_MUERTE);
+                                   Clases.PICARO, Clases.BRUJO);
             case ORCO -> List.of(Clases.GUERRERO, Clases.CAZADOR, Clases.PICARO, Clases.CHAMAN,
-                                 Clases.BRUJO, Clases.CABALLERO_DE_LA_MUERTE);
+                                 Clases.BRUJO);
             case ENANO -> List.of(Clases.GUERRERO, Clases.PALADIN, Clases.CAZADOR, Clases.PICARO,
-                                  Clases.SACERDOTE, Clases.CABALLERO_DE_LA_MUERTE);
+                                  Clases.SACERDOTE);
             case ELFO_NOCHE -> List.of(Clases.GUERRERO, Clases.CAZADOR, Clases.PICARO, Clases.SACERDOTE,
-                                       Clases.DRUIDA, Clases.CABALLERO_DE_LA_MUERTE);
+                                       Clases.DRUIDA);
             case NO_MUERTO -> List.of(Clases.GUERRERO, Clases.PICARO, Clases.SACERDOTE, Clases.MAGO,
-                                      Clases.BRUJO, Clases.CABALLERO_DE_LA_MUERTE);
-            case TAUREN -> List.of(Clases.GUERRERO, Clases.CAZADOR, Clases.CHAMAN, Clases.DRUIDA,
-                                   Clases.CABALLERO_DE_LA_MUERTE);
-            case GNOMO -> List.of(Clases.GUERRERO, Clases.PICARO, Clases.MAGO, Clases.BRUJO,
-                                  Clases.CABALLERO_DE_LA_MUERTE);
+                                      Clases.BRUJO);
+            case TAUREN -> List.of(Clases.GUERRERO, Clases.CAZADOR, Clases.CHAMAN, Clases.DRUIDA);
+            case GNOMO -> List.of(Clases.GUERRERO, Clases.PICARO, Clases.MAGO, Clases.BRUJO);
             case TROLL -> List.of(Clases.GUERRERO, Clases.CAZADOR, Clases.PICARO, Clases.SACERDOTE,
-                                  Clases.CHAMAN, Clases.MAGO, Clases.CABALLERO_DE_LA_MUERTE);
+                                  Clases.CHAMAN, Clases.MAGO);
             case DRAENEI -> List.of(Clases.GUERRERO, Clases.PALADIN, Clases.CAZADOR, Clases.SACERDOTE,
-                                    Clases.CHAMAN, Clases.MAGO, Clases.CABALLERO_DE_LA_MUERTE);
+                                    Clases.CHAMAN, Clases.MAGO);
             case ELFO_SANGRE -> List.of(Clases.GUERRERO, Clases.PALADIN, Clases.CAZADOR, Clases.PICARO,
-                                        Clases.SACERDOTE, Clases.MAGO, Clases.BRUJO, Clases.CABALLERO_DE_LA_MUERTE);
+                                        Clases.SACERDOTE, Clases.MAGO, Clases.BRUJO);
         };
 
         // Buscar las entidades Clase correspondientes

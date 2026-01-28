@@ -9,7 +9,5 @@ public enum Clases {
     BRUJO,
     PALADIN,
     DRUIDA,
-    SACERDOTE,
-    MONJE,
-    CABALLERO_DE_LA_MUERTE,
+    SACERDOTE
 }
