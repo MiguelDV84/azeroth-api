@@ -9,6 +9,8 @@ import com.azeroth.api.mapper.JugadorMapper;
 import com.azeroth.api.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +25,9 @@ public class JugadorService {
     private final IRazaRepository razaRepository;
     private final IHermandadRepository hermandadRepository;
 
+    private static final int XP_BASE = 500;
+    private static final double EXPONENTE = 1.5;
+
     public Optional<JugadorResponse> guardar(JugadorRequest request) {
         Jugador jugador = jugadorMapper.jugadorRequestToJugador(request);
         Clase clase = claseRepository.findById(request.claseId())
@@ -31,7 +36,6 @@ public class JugadorService {
                 .orElseThrow(() -> new RuntimeException("Raza no encontrada con id: " + request.razaId()));
         Faccion faccion = faccionRepository.findById(request.faccionId())
                 .orElseThrow(() -> new RuntimeException("Facción no encontrada con id: " + request.faccionId()));
-        // Validar que la clase sea compatible con la raza
 
         boolean claseValida = raza.getClasesDisponibles().stream()
                 .anyMatch(c -> c.getId().equals(clase.getId()));
@@ -107,5 +111,31 @@ public class JugadorService {
         jugador.setHermandad(null);
         Jugador jugadorActualizado = jugadorRepository.save(jugador);
         return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorActualizado));
+    }
+
+    public Optional<JugadorResponse> ganarExperiencia(Long jugadorId, BigDecimal cantidadGanada) {
+        Jugador jugador = jugadorRepository.findById(jugadorId)
+                .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + jugadorId));
+
+        jugador.setExperiencia(jugador.getExperiencia().add(cantidadGanada));
+
+        while (jugador.getExperiencia().compareTo(calcularXpRequerida(jugador.getNivel())) >= 0) {
+            subirNivel(jugador);
+        }
+
+        Jugador jugadorActualizado = jugadorRepository.save(jugador);
+        return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorActualizado));
+    }
+
+    private BigDecimal calcularXpRequerida(int nivelActual) {
+        // Formula:  500 * (nivelActual ^ 1.5)
+        double xpRequerida = XP_BASE * Math.pow(nivelActual, EXPONENTE);
+        return BigDecimal.valueOf(xpRequerida);
+    }
+
+    private void subirNivel(Jugador jugador) {
+        jugador.setExperiencia(BigDecimal.valueOf(0));
+
+        jugador.setNivel(jugador.getNivel() + 1);
     }
 }

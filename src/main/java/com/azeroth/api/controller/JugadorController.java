@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequestMapping("api/jugadores")
 @RequiredArgsConstructor
@@ -59,12 +61,16 @@ public class JugadorController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarJugador(@PathVariable Long id) {
         jugadorService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/experiencia/{id}/{experiencia}")
+    public ResponseEntity<JugadorResponse> nivelUp(@PathVariable Long id, @PathVariable BigDecimal experiencia) {
+        return jugadorService.ganarExperiencia(id, experiencia)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
 }
