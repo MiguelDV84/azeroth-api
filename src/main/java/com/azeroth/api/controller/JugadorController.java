@@ -7,10 +7,12 @@ import com.azeroth.api.dto.JugadorResponse;
 import com.azeroth.api.service.JugadorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 
 @RestController
@@ -28,8 +30,10 @@ public class JugadorController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<Iterable<JugadorResponse>> listarJugadores() {
-        Iterable<JugadorResponse> jugadores = jugadorService.findAll();
+    public ResponseEntity<Page<JugadorResponse>> listarJugadores(
+            @PageableDefault(size = 10, page = 0) Pageable pageable
+    ) {
+        Page<JugadorResponse> jugadores = jugadorService.findAll(pageable);
         return ResponseEntity.ok().body(jugadores);
     }
 

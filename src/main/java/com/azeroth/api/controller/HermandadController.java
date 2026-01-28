@@ -6,6 +6,9 @@ import com.azeroth.api.dto.HermandadResponse;
 import com.azeroth.api.service.HermandadService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +28,10 @@ public class HermandadController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<Iterable<HermandadResponse>> listarHermandades() {
-        Iterable<HermandadResponse> hermandades = hermandadService.obtenerTodas();
+    public ResponseEntity<Page<HermandadResponse>> listarHermandades(
+            @PageableDefault(size = 10, page = 0) Pageable pageable
+    ) {
+        Page<HermandadResponse> hermandades = hermandadService.findAll(pageable);
         return ResponseEntity.ok().body(hermandades);
     }
 

@@ -9,9 +9,10 @@ import com.azeroth.api.mapper.HermandadMapper;
 import com.azeroth.api.repository.IFaccionRepository;
 import com.azeroth.api.repository.IHermandadRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,11 +37,9 @@ public class HermandadService {
                 .map(hermandadMapper::hermandadToHermandadResponse);
     }
 
-    public List<HermandadResponse> obtenerTodas() {
-        return hermandadRepository.findAll()
-                .stream()
-                .map(hermandadMapper::hermandadToHermandadResponse)
-                .toList();
+    public Page<HermandadResponse> findAll(Pageable pageable) {
+        return hermandadRepository.findAll(pageable)
+                .map(hermandadMapper::hermandadToHermandadResponse);
     }
 
     public Optional<HermandadResponse> editar(Long id, HermandadRequest request) {

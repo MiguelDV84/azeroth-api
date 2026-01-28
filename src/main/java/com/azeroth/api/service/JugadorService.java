@@ -10,9 +10,10 @@ import com.azeroth.api.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -60,10 +61,9 @@ public class JugadorService {
         return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorGuardado));
     }
 
-    public List<JugadorResponse> findAll() {
-        return jugadorRepository.findAll().stream()
-                .map(jugadorMapper::jugadorToJugadorResponse)
-                .toList();
+    public Page<JugadorResponse> findAll(Pageable pageable) {
+        return jugadorRepository.findAll(pageable)
+                .map(jugadorMapper::jugadorToJugadorResponse);
     }
 
     public Optional<JugadorResponse> findById(Long id) {
