@@ -67,8 +67,8 @@ public class JugadorController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/experiencia/{id}/{experiencia}")
-    public ResponseEntity<JugadorResponse> nivelUp(@PathVariable Long id, @PathVariable BigDecimal experiencia) {
+    @PutMapping("/experiencia/{id}")
+    public ResponseEntity<JugadorResponse> nivelUp(@PathVariable Long id, @RequestParam BigDecimal experiencia) {
         return jugadorService.ganarExperiencia(id, experiencia)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());

@@ -26,9 +26,6 @@ public class JugadorService {
     private final IRazaRepository razaRepository;
     private final IHermandadRepository hermandadRepository;
 
-    private static final int XP_BASE = 500;
-    private static final double EXPONENTE = 1.5;
-
     public Optional<JugadorResponse> guardar(JugadorRequest request) {
         Jugador jugador = jugadorMapper.jugadorRequestToJugador(request);
         Clase clase = claseRepository.findById(request.claseId())
@@ -48,14 +45,12 @@ public class JugadorService {
             );
         }
 
-
         if (!raza.getFaccion().getId().equals(faccion.getId())) {
             throw new RuntimeException(
                     String.format("La raza %s no pertenece a la facción %s",
                             raza.getNombre(), faccion.getNombre())
             );
         }
-
 
         jugador.setFaccion(faccion);
         jugador.setClase(clase);
