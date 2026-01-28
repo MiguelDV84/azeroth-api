@@ -16,5 +16,6 @@ public record JugadorResponse(
         Facciones faccion,
         int nivel,
         BigDecimal experiencia,
+        BigDecimal experienciaParaProximoNivel,
         String hermandad
 ) { }

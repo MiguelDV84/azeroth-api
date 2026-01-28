@@ -13,6 +13,7 @@ public interface JugadorMapper {
     @Mapping(target = "raza", expression = "java(jugador.getRaza() != null ? jugador.getRaza().getNombre() : null)")
     @Mapping(target = "faccion", expression = "java(jugador.getFaccion() != null ? jugador.getFaccion().getNombre() : null)")
     @Mapping(target = "hermandad", expression = "java(jugador.getHermandad() != null ? jugador.getHermandad().getNombre() : null)")
+    @Mapping(target = "experienciaParaProximoNivel", expression = "java(jugador.calcularXpRequerida(jugador.getNivel()))")
     JugadorResponse jugadorToJugadorResponse(Jugador jugador);
 
     @Mapping(target = "id", ignore = true)

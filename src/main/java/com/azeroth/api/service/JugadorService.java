@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 
@@ -117,25 +118,13 @@ public class JugadorService {
         Jugador jugador = jugadorRepository.findById(jugadorId)
                 .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + jugadorId));
 
-        jugador.setExperiencia(jugador.getExperiencia().add(cantidadGanada));
+        jugador.setExperiencia(jugador.getExperiencia().add(cantidadGanada.setScale(0, RoundingMode.DOWN)));
 
-        while (jugador.getExperiencia().compareTo(calcularXpRequerida(jugador.getNivel())) >= 0) {
-            subirNivel(jugador);
+        while (jugador.getExperiencia().compareTo(jugador.calcularXpRequerida(jugador.getNivel())) >= 0) {
+            jugador.subirNivel(jugador);
         }
 
         Jugador jugadorActualizado = jugadorRepository.save(jugador);
         return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorActualizado));
-    }
-
-    private BigDecimal calcularXpRequerida(int nivelActual) {
-        // Formula:  500 * (nivelActual ^ 1.5)
-        double xpRequerida = XP_BASE * Math.pow(nivelActual, EXPONENTE);
-        return BigDecimal.valueOf(xpRequerida);
-    }
-
-    private void subirNivel(Jugador jugador) {
-        jugador.setExperiencia(BigDecimal.valueOf(0));
-
-        jugador.setNivel(jugador.getNivel() + 1);
     }
 }
