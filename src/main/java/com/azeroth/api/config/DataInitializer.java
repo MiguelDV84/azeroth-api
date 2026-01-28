@@ -17,6 +17,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Configuration
@@ -104,48 +105,48 @@ public class DataInitializer {
                         Logros.builder()
                                 .titulo("Primer Paso")
                                 .descripcion("Alcanza el nivel 10")
-                                .puntosDeLogro(10)
+                                .puntosDeLogro(BigDecimal.valueOf(10))
                                 .valorObjetivo(10)
                                 .build(),
                         Logros.builder()
                                 .titulo("Héroe Novato")
                                 .descripcion("Completa 5 misiones")
-                                .puntosDeLogro(25)
+                                .puntosDeLogro(BigDecimal.valueOf(25))
                                 .valorObjetivo(5)
                                 .build(),
                         Logros.builder()
                                 .titulo("Guerrero Experimentado")
                                 .descripcion("Alcanza el nivel 50")
-                                .puntosDeLogro(50)
+                                .puntosDeLogro(BigDecimal.valueOf(50))
                                 .valorObjetivo(50)
                                 .build(),
                         Logros.builder()
                                 .titulo("Maestro de Hermandades")
                                 .descripcion("Únete a una hermandad y participa en 10 eventos")
-                                .puntosDeLogro(75)
+                                .puntosDeLogro(BigDecimal.valueOf(75))
                                 .build(),
                         Logros.builder()
                                 .titulo("Leyenda de Azeroth")
                                 .descripcion("Alcanza el nivel máximo")
-                                .puntosDeLogro(100)
+                                .puntosDeLogro(BigDecimal.valueOf(100))
                                 .valorObjetivo(70)
                                 .build(),
                         Logros.builder()
                                 .titulo("Cazador de Tesoros")
                                 .descripcion("Encuentra 20 objetos épicos")
-                                .puntosDeLogro(40)
+                                .puntosDeLogro(BigDecimal.valueOf(40))
                                 .valorObjetivo(20)
                                 .build(),
                         Logros.builder()
                                 .titulo("Defensor del Reino")
                                 .descripcion("Gana 100 combates PvP")
-                                .puntosDeLogro(60)
+                                .puntosDeLogro(BigDecimal.valueOf(60))
                                 .valorObjetivo(100)
                                 .build(),
                         Logros.builder()
                                 .titulo("Explorador")
                                 .descripcion("Visita todas las zonas del mapa")
-                                .puntosDeLogro(35)
+                                .puntosDeLogro(BigDecimal.valueOf(35))
                                 .build()
                 ));
                 logger.info("Datos base de logros cargados exitosamente");
@@ -189,6 +190,5 @@ public class DataInitializer {
                         .orElseThrow(() -> new RuntimeException("Clase no encontrada: " + claseEnum)))
                 .toList();
     }
-
 }
 

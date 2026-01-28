@@ -4,6 +4,8 @@ package com.azeroth.api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Builder
 @AllArgsConstructor
@@ -24,7 +26,7 @@ public class Logros {
     private String descripcion;
 
     @Column(name = "puntos_de_logro", nullable = false)
-    private int puntosDeLogro;
+    private BigDecimal puntosDeLogro;
 
     @Column(name = "valor_objetivo", nullable = false)
     private int valorObjetivo;

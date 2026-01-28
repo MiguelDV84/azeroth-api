@@ -65,7 +65,10 @@ public class Jugador {
             jugador.setExperiencia(BigDecimal.valueOf(0));
             return;
         }
-        jugador.setExperiencia(BigDecimal.valueOf(0));
+
+        BigDecimal experienciaActual = jugador.getExperiencia()
+                .subtract(jugador.calcularXpRequerida(jugador.getNivel()));
+        jugador.setExperiencia(experienciaActual.setScale(0, RoundingMode.DOWN));
 
         jugador.setNivel(jugador.getNivel() + 1);
     }
