@@ -13,7 +13,11 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "progreso")
+@Table(name = "progreso",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_jugador_logro",
+                columnNames = {"jugador_id", "logro_id"}
+        ))
 public class Progreso {
 
     @Id

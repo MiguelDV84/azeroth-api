@@ -1,9 +1,6 @@
 package com.azeroth.api.controller;
 
-import com.azeroth.api.dto.JugadorEditarRequest;
-import com.azeroth.api.dto.JugadorHermandadRequest;
-import com.azeroth.api.dto.JugadorRequest;
-import com.azeroth.api.dto.JugadorResponse;
+import com.azeroth.api.dto.*;
 import com.azeroth.api.service.JugadorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -74,6 +71,13 @@ public class JugadorController {
     @PutMapping("/experiencia/{id}")
     public ResponseEntity<JugadorResponse> nivelUp(@PathVariable Long id, @RequestParam BigDecimal experiencia) {
         return jugadorService.ganarExperiencia(id, experiencia)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @PutMapping("/inicializar-logros/{id}")
+    public ResponseEntity<JugadorLogrosResponse> inicializarLogros(@PathVariable Long id) {
+        return jugadorService.inicializarProgresoParaJugador(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }

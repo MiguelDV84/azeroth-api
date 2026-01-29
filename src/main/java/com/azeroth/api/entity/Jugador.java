@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 @Entity
 @Builder
@@ -54,6 +55,9 @@ public class Jugador {
     @JoinColumn(name = "raza_id", nullable = false)
     private Raza raza;
 
+    @OneToMany(mappedBy = "jugador", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Progreso> progresos;
+
     public BigDecimal calcularXpRequerida(int nivelActual) {
         // Formula:  500 * (nivelActual ^ 1.5)
         double xpRequerida = XP_BASE * Math.pow(nivelActual, EXPONENTE);
@@ -71,5 +75,11 @@ public class Jugador {
         jugador.setExperiencia(experienciaActual.setScale(0, RoundingMode.DOWN));
 
         jugador.setNivel(jugador.getNivel() + 1);
+    }
+
+    public void comprobarExperiencia() {
+        while (this.getExperiencia().compareTo(this.calcularXpRequerida(this.getNivel())) >= 0) {
+            this.subirNivel(this);
+        }
     }
 }

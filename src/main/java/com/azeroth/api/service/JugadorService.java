@@ -1,10 +1,9 @@
 package com.azeroth.api.service;
 
-import com.azeroth.api.dto.JugadorEditarRequest;
-import com.azeroth.api.dto.JugadorHermandadRequest;
-import com.azeroth.api.dto.JugadorRequest;
-import com.azeroth.api.dto.JugadorResponse;
+import com.azeroth.api.dto.*;
 import com.azeroth.api.entity.*;
+import com.azeroth.api.enums.EstadoLogro;
+import com.azeroth.api.mapper.JugadorLogroMapper;
 import com.azeroth.api.mapper.JugadorMapper;
 import com.azeroth.api.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,11 +21,15 @@ import java.util.Optional;
 public class JugadorService {
 
     private final JugadorMapper jugadorMapper;
+    private final JugadorLogroMapper jugadorLogroMapper;
+
     private final IJugadorRepository jugadorRepository;
     private final IFaccionRepository faccionRepository;
     private final IClaseRepository claseRepository;
     private final IRazaRepository razaRepository;
     private final IHermandadRepository hermandadRepository;
+    private final ILogroRepository logroRepository;
+    private final IProgresoRepository progresoRepository;
 
     public Optional<JugadorResponse> guardar(JugadorRequest request) {
         Jugador jugador = jugadorMapper.jugadorRequestToJugador(request);
@@ -115,11 +119,29 @@ public class JugadorService {
 
         jugador.setExperiencia(jugador.getExperiencia().add(cantidadGanada.setScale(0, RoundingMode.DOWN)));
 
-        while (jugador.getExperiencia().compareTo(jugador.calcularXpRequerida(jugador.getNivel())) >= 0) {
-            jugador.subirNivel(jugador);
-        }
+        jugador.comprobarExperiencia();
 
         Jugador jugadorActualizado = jugadorRepository.save(jugador);
         return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorActualizado));
+    }
+
+    public Optional<JugadorLogrosResponse> inicializarProgresoParaJugador(Long jugadorId) {
+        Jugador jugador = jugadorRepository.findById(jugadorId)
+                .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + jugadorId));
+        List<Logros> todosLosLogros = logroRepository.findAll();
+
+        List<Progreso> progresos = todosLosLogros.stream()
+                .map(logro -> Progreso.builder()
+                        .jugador(jugador)
+                        .logro(logro)
+                        .valorActual(0)
+                        .valorObjetivo(logro.getValorObjetivo())
+                        .estado(EstadoLogro.EN_PROGRESO)
+                        .build())
+                .toList();
+
+        progresoRepository.saveAll(progresos);
+
+        return Optional.of(jugadorLogroMapper.jugadorToJugadorLogrosResponse(jugador));
     }
 }
