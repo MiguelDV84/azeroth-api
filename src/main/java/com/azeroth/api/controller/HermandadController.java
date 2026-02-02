@@ -54,4 +54,10 @@ public class HermandadController {
         hermandadService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}/cantidad-jugadores")
+    public ResponseEntity<Long> obtenerCantidadJugadores(@PathVariable Long id) {
+        Long cantidad = hermandadService.obtenerCantidadJugadores(id);
+        return ResponseEntity.ok(cantidad);
+    }
 }

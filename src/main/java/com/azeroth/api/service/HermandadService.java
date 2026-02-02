@@ -59,4 +59,9 @@ public class HermandadService {
     public void eliminar(Long id) {
         hermandadRepository.deleteById(id);
     }
+
+    @Transactional(readOnly = true)
+    public long obtenerCantidadJugadores(Long hermandadId) {
+        return hermandadRepository.countJugadoresByHermandadId(hermandadId);
+    }
 }
