@@ -35,7 +35,7 @@ public class LogroController {
     @ApiResponse(responseCode = "200", description = "Página de logros",
             content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = LogroResponse.class))))
     public ResponseEntity<Page<LogroResponse>> listarLogros(
-            @PageableDefault(size = 10, page = 0) Pageable pageable
+            @PageableDefault(size = 10) Pageable pageable
     ) {
         Page<LogroResponse> logros = logroService.findAll(pageable);
         return ResponseEntity.ok().body(logros);

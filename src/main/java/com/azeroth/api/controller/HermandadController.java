@@ -47,7 +47,7 @@ public class HermandadController {
     @ApiResponse(responseCode = "200", description = "Página de hermandades",
             content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = HermandadResponse.class))))
     public ResponseEntity<Page<HermandadResponse>> listarHermandades(
-            @PageableDefault(size = 10, page = 0) Pageable pageable
+            @PageableDefault(size = 10) Pageable pageable
     ) {
         Page<HermandadResponse> hermandades = hermandadService.findAll(pageable);
         return ResponseEntity.ok().body(hermandades);
