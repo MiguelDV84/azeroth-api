@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ public class LogroService {
     private final ILogroRepository logroRepository;
     private final LogroMapper logroMapper;
 
+    @Transactional(readOnly = true)
    public Page<LogroResponse> findAll(Pageable pageable) {
         return logroRepository.findAll(pageable)
                 .map(logroMapper::logroToLogroResponse);

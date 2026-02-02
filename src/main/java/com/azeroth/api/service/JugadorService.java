@@ -2,15 +2,21 @@ package com.azeroth.api.service;
 
 import com.azeroth.api.dto.*;
 import com.azeroth.api.entity.*;
+import com.azeroth.api.enums.ErrorCode;
 import com.azeroth.api.enums.EstadoLogro;
+import com.azeroth.api.exception.BussinesException;
+import com.azeroth.api.exception.GlobalExceptionHandler;
 import com.azeroth.api.mapper.JugadorLogroMapper;
 import com.azeroth.api.mapper.JugadorMapper;
 import com.azeroth.api.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -31,6 +37,7 @@ public class JugadorService {
     private final ILogroRepository logroRepository;
     private final IProgresoRepository progresoRepository;
 
+    @Transactional
     public Optional<JugadorResponse> guardar(JugadorRequest request) {
         Jugador jugador = jugadorMapper.jugadorRequestToJugador(request);
         Clase clase = claseRepository.findById(request.claseId())
@@ -40,20 +47,29 @@ public class JugadorService {
         Faccion faccion = faccionRepository.findById(request.faccionId())
                 .orElseThrow(() -> new RuntimeException("Facción no encontrada con id: " + request.faccionId()));
 
+        if(jugadorRepository.findByNombre(request.nombre()).isPresent()) {
+            throw new BussinesException(
+                    String.format("El nombre %s ya está en uso por otro jugador", request.nombre()),
+                    ErrorCode.NOMBRE_JUGADOR_YA_EN_USO
+            );
+        }
+
         boolean claseValida = raza.getClasesDisponibles().stream()
                 .anyMatch(c -> c.getId().equals(clase.getId()));
 
         if (!claseValida) {
-            throw new RuntimeException(
+            throw new BussinesException(
                     String.format("La clase %s no está disponible para la raza %s",
-                            clase.getNombre(), raza.getNombre())
+                            clase.getNombre(), raza.getNombre()),
+                    ErrorCode.CLASE_NO_DISPONIBLE_PARA_RAZA
             );
         }
 
         if (!raza.getFaccion().getId().equals(faccion.getId())) {
-            throw new RuntimeException(
+            throw new BussinesException(
                     String.format("La raza %s no pertenece a la facción %s",
-                            raza.getNombre(), faccion.getNombre())
+                            raza.getNombre(), faccion.getNombre()),
+                    ErrorCode.RAZA_NO_DISPONIBLE_PARA_FACCION
             );
         }
 
@@ -65,6 +81,7 @@ public class JugadorService {
         return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorGuardado));
     }
 
+    @Transactional(readOnly = true)
     public Page<JugadorResponse> findAll(Pageable pageable) {
         return jugadorRepository.findAll(pageable)
                 .map(jugadorMapper::jugadorToJugadorResponse);
@@ -75,10 +92,13 @@ public class JugadorService {
                 .map(jugadorMapper::jugadorToJugadorResponse);
     }
 
+
+    @Transactional
     public void eliminar(Long id) {
         jugadorRepository.deleteById(id);
     }
 
+    @Transactional
     public Optional<JugadorResponse> editar(Long idJugador, JugadorEditarRequest request) {
         Jugador jugador = jugadorRepository.findById(idJugador)
                 .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + idJugador));
@@ -87,6 +107,7 @@ public class JugadorService {
         return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorActualizado));
     }
 
+    @Transactional
     public Optional<JugadorResponse> asignarHermandad(Long idJugador, JugadorHermandadRequest request) {
         Jugador jugador = jugadorRepository.findById(idJugador)
                 .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + idJugador));
@@ -94,9 +115,10 @@ public class JugadorService {
                 .orElseThrow(() -> new RuntimeException("Hermandad no encontrada con id: " + request.hermandadId()));
 
         if(!jugador.getFaccion().getId().equals(hermandad.getFaccion().getId())) {
-            throw new RuntimeException(
+            throw new BussinesException(
                     String.format("El jugador %s no puede unirse a la hermandad %s debido a que pertenecen a facciones diferentes.",
-                            jugador.getNombre(), hermandad.getNombre())
+                            jugador.getNombre(), hermandad.getNombre()),
+                    ErrorCode.HERMANDAD_FACION_NO_COINCIDE
             );
         }
 
@@ -105,6 +127,7 @@ public class JugadorService {
         return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorActualizado));
     }
 
+    @Transactional
     public Optional<JugadorResponse> eliminarHermandad(Long idJugador) {
         Jugador jugador = jugadorRepository.findById(idJugador)
                 .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + idJugador));
@@ -113,6 +136,7 @@ public class JugadorService {
         return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorActualizado));
     }
 
+    @Transactional
     public Optional<JugadorResponse> ganarExperiencia(Long jugadorId, BigDecimal cantidadGanada) {
         Jugador jugador = jugadorRepository.findById(jugadorId)
                 .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + jugadorId));
@@ -125,6 +149,7 @@ public class JugadorService {
         return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorActualizado));
     }
 
+    @Transactional
     public Optional<JugadorLogrosResponse> inicializarProgresoParaJugador(Long jugadorId) {
         Jugador jugador = jugadorRepository.findById(jugadorId)
                 .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + jugadorId));

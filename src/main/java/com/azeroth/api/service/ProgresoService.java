@@ -10,6 +10,7 @@ import com.azeroth.api.repository.IJugadorRepository;
 import com.azeroth.api.repository.IProgresoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -23,6 +24,7 @@ public class ProgresoService {
 
     private final ProgresoMapper progresoMapper;
 
+    @Transactional
     public Optional<ProgresoResponse> actualizarProgreso(Long jugadorId, Long logroId) {
         Progreso progreso = progresoRepository.findByJugadorIdAndLogroId(jugadorId, logroId)
                 .orElseThrow(() -> new RuntimeException("Progreso no encontrado para el jugador: " + jugadorId + " y logro: " + logroId + " especificados"));

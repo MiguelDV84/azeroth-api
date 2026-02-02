@@ -21,6 +21,7 @@ public interface ProgresoMapper {
 
     @Mapping(target = "idJugador", expression = "java(progreso.getJugador() != null ? progreso.getJugador().getId() : null)")
     @Mapping(target = "nombreJugador", expression = "java(progreso.getJugador() != null ? progreso.getJugador().getNombre() : null)")
+    @Mapping(target = "logroId", expression = "java(progreso.getLogro() != null ? progreso.getLogro().getId() : null)")
     ProgresoResponse progresoToProgresoResponse(Progreso progreso);
 
     Progreso progresoResponseToProgreso(ProgresoResponse progresoResponse);

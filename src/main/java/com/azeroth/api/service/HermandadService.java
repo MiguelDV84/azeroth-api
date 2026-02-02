@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -23,6 +24,7 @@ public class HermandadService {
     private final IHermandadRepository hermandadRepository;
     private final IFaccionRepository faccionRepository;
 
+    @Transactional
     public Optional<HermandadResponse> guardar(HermandadRequest request) {
         Hermandad hermandad = hermandadMapper.hermandadRequestToHermandad(request);
         Faccion faccion = faccionRepository.findById(request.faccionId())
@@ -32,16 +34,18 @@ public class HermandadService {
         return Optional.of(hermandadMapper.hermandadToHermandadResponse(hermandadGuardada));
     }
 
+    @Transactional(readOnly = true)
     public Optional<HermandadResponse> obtenerPorId(Long id) {
         return hermandadRepository.findById(id)
                 .map(hermandadMapper::hermandadToHermandadResponse);
     }
 
+    @Transactional(readOnly = true)
     public Page<HermandadResponse> findAll(Pageable pageable) {
         return hermandadRepository.findAll(pageable)
                 .map(hermandadMapper::hermandadToHermandadResponse);
     }
-
+    @Transactional
     public Optional<HermandadResponse> editar(Long id, HermandadRequest request) {
         Hermandad hermandad = hermandadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Hermandad no encontrada con id: " + id));
@@ -51,8 +55,8 @@ public class HermandadService {
         return Optional.of(hermandadMapper.hermandadToHermandadResponse(hermandadEditada));
     }
 
+    @Transactional
     public void eliminar(Long id) {
         hermandadRepository.deleteById(id);
     }
-
 }
