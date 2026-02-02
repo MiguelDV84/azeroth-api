@@ -10,5 +10,6 @@ public enum Razas {
     NO_MUERTO,
     TROLL,
     DRAENEI,
-    ELFO_SANGRE
+    ELFO_SANGRE,
+    HUARGEN
 }

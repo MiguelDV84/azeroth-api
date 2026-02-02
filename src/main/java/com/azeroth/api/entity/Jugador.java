@@ -39,19 +39,19 @@ public class Jugador {
     @Column(name = "experiencia", nullable = false)
     private BigDecimal experiencia = BigDecimal.ZERO.setScale(0, RoundingMode.DOWN);
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hermandad_id")
     private Hermandad hermandad;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "faccion_id", nullable = false)
     private Faccion faccion;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "clase_id", nullable = false)
     private Clase clase;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "raza_id", nullable = false)
     private Raza raza;
 

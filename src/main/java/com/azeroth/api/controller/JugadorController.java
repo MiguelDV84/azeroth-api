@@ -45,7 +45,7 @@ public class JugadorController {
     @ApiResponse(responseCode = "200", description = "Página de jugadores",
             content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = JugadorResponse.class))))
     public ResponseEntity<Page<JugadorResponse>> listarJugadores(
-            @PageableDefault(size = 10) Pageable pageable
+            @PageableDefault(size = 5) Pageable pageable
     ) {
         Page<JugadorResponse> jugadores = jugadorService.findAll(pageable);
         return ResponseEntity.ok().body(jugadores);
