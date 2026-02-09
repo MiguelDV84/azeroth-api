@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {JugadorMapper.class})
 public interface HermandadMapper {
+    @Mapping(target = "idHermandad", source = "id")
     @Mapping(target = "nombre", expression = "java(hermandad.getNombre() != null ? hermandad.getNombre() : null)")
     @Mapping(target = "reino", expression = "java(hermandad.getReino() != null ? hermandad.getReino() : null)")
     @Mapping(target = "faccion", expression = "java(hermandad.getFaccion() != null ? hermandad.getFaccion().getNombre() : null)")

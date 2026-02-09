@@ -28,7 +28,7 @@ public class Hermandad {
     @Column(name = "reino", nullable = false)
     private Reino reino;
 
-    @OneToMany(mappedBy = "hermandad", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "hermandad", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Jugador> jugadores = new ArrayList<>();
 

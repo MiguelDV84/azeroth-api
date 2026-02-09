@@ -33,7 +33,9 @@ public class ProgresoService {
         if (progreso.getEstado() == EstadoLogro.COMPLETADO) {
             return Optional.of(progresoMapper.progresoToProgresoResponse(progreso));
         }
-
+        if(progreso.getValorActual() >= progreso.getValorObjetivo()){
+            return Optional.of(progresoMapper.progresoToProgresoResponse(progreso));
+        }
         progreso.setValorActual(progreso.getValorActual() + 1);
 
         evaluarYCompletarLogro(progreso);

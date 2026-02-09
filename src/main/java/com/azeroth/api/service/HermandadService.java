@@ -57,7 +57,14 @@ public class HermandadService {
 
     @Transactional
     public void eliminar(Long id) {
-        hermandadRepository.deleteById(id);
+        Hermandad hermandad = hermandadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Hermandad no encontrada con id: " + id));
+
+        // Desvincular jugadores de la hermandad antes de eliminarla
+        hermandad.getJugadores().forEach(jugador -> jugador.setHermandad(null));
+        hermandad.getJugadores().clear();
+
+        hermandadRepository.delete(hermandad);
     }
 
     @Transactional(readOnly = true)
