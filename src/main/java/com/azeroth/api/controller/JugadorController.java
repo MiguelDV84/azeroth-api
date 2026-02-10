@@ -65,10 +65,8 @@ public class JugadorController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar jugador", description = "Actualiza los datos de un jugador")
-    @ApiResponse(responseCode = "200", description = "Jugador actualizado",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = JugadorResponse.class)))
-    @ApiResponse(responseCode = "404", description = "Jugador no encontrado",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "200", description = "Jugador actualizado")
+    @ApiResponse(responseCode = "404", description = "Jugador no encontrado")
     public ResponseEntity<JugadorResponse> actualizarJugador(@Parameter(description = "ID del jugador", required = true, example = "1") @PathVariable Long id, @RequestBody @Valid JugadorEditarRequest request) {
         return jugadorService.editar(id, request)
                 .map(ResponseEntity::ok)
@@ -77,10 +75,8 @@ public class JugadorController {
 
     @PutMapping("/hermandad/{id}")
     @Operation(summary = "Asignar hermandad", description = "Asignar una hermandad a un jugador")
-    @ApiResponse(responseCode = "200", description = "Hermandad asignada",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = JugadorResponse.class)))
-    @ApiResponse(responseCode = "404", description = "Jugador o hermandad no encontrado",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "200", description = "Hermandad asignada")
+    @ApiResponse(responseCode = "404", description = "Jugador o hermandad no encontrado")
     public ResponseEntity<JugadorResponse> asignarHermandad(@Parameter(description = "ID del jugador", required = true, example = "1") @PathVariable Long id, @RequestBody @Valid JugadorHermandadRequest request) {
         return jugadorService.asignarHermandad(id, request)
                 .map(ResponseEntity::ok)
@@ -89,10 +85,8 @@ public class JugadorController {
 
     @PutMapping("/remover-hermandad/{id}")
     @Operation(summary = "Remover hermandad", description = "Remover la hermandad de un jugador")
-    @ApiResponse(responseCode = "200", description = "Hermandad removida",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = JugadorResponse.class)))
-    @ApiResponse(responseCode = "404", description = "Jugador no encontrado",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "200", description = "Hermandad removida")
+    @ApiResponse(responseCode = "404", description = "Jugador no encontrado")
     public ResponseEntity<JugadorResponse> removerHermandad(@Parameter(description = "ID del jugador", required = true, example = "1") @PathVariable Long id) {
         return jugadorService.eliminarHermandad(id)
                 .map(ResponseEntity::ok)

@@ -45,5 +45,4 @@ public class Progreso {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "logro_id", nullable = false)
     private Logros logro;
-
 }

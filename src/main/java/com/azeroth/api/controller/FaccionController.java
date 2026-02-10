@@ -31,7 +31,7 @@ public class FaccionController {
     @GetMapping("/list")
     @Operation(summary = "Listar facciones", description = "Devuelve una página de facciones")
     @ApiResponse(responseCode = "200", description = "Página de facciones",
-            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = FaccionResponse.class))))
+            content = @Content(mediaType = "application/json"))
     public ResponseEntity<Page<FaccionResponse>> listarFacciones(
             @PageableDefault(size = 10) Pageable pageable
     ) {

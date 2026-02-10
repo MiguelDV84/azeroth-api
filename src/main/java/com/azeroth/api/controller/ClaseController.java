@@ -31,6 +31,7 @@ public class ClaseController {
     @Operation(summary = "Listar clases", description = "Devuelve una página de clases con sus razas disponibles")
     @ApiResponse(responseCode = "200", description = "Página de clases",
             content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ClaseResponse.class))))
+
     public ResponseEntity<Page<ClaseResponse>> listarClases(
             @PageableDefault(size = 10) Pageable pageable
     ) {
@@ -44,6 +45,7 @@ public class ClaseController {
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClaseResponse.class)))
     @ApiResponse(responseCode = "404", description = "Clase no encontrada",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+
     public ResponseEntity<ClaseResponse> obtenerClasePorId(@Parameter(description = "ID de la clase", required = true, example = "1") @PathVariable Long id) {
         return claseService.obtenerPorId(id)
                 .map(ResponseEntity::ok)

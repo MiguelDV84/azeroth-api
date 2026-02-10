@@ -64,6 +64,12 @@ public class Jugador {
         return BigDecimal.valueOf(xpRequerida).setScale(0, RoundingMode.DOWN);
     }
 
+    public void comprobarExperiencia() {
+        while (this.getExperiencia().compareTo(this.calcularXpRequerida(this.getNivel())) >= 0) {
+            this.subirNivel(this);
+        }
+    }
+
     public void subirNivel(Jugador jugador) {
         if(jugador.getNivel() >= 70) {
             jugador.setExperiencia(BigDecimal.valueOf(0));
@@ -77,9 +83,5 @@ public class Jugador {
         jugador.setNivel(jugador.getNivel() + 1);
     }
 
-    public void comprobarExperiencia() {
-        while (this.getExperiencia().compareTo(this.calcularXpRequerida(this.getNivel())) >= 0) {
-            this.subirNivel(this);
-        }
-    }
+
 }
