@@ -19,6 +19,12 @@ target/
 *.iml
 *.ipr
 
+### Agent metadata ###
+.agents/
+
+### GitHub metadata ###
+.github/
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -31,3 +37,19 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Node / React ###
+node_modules/
+**/node_modules/
+src/main/frontend/node_modules/
+src/main/frontend/dist/
+src/main/frontend/.vite/
+src/main/frontend/.cache/
+src/main/frontend/coverage/
+src/main/frontend/.eslintcache
+src/main/frontend/npm-debug.log*
+src/main/frontend/yarn-debug.log*
+src/main/frontend/yarn-error.log*
+src/main/frontend/pnpm-debug.log*
+src/main/frontend/.env
+src/main/frontend/.env.*
