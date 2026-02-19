@@ -110,6 +110,9 @@ export const api = {
       method: 'PUT',
     });
   },
+  getLogrosJugador(jugadorId) {
+    return request(`/api/jugadores/${jugadorId}/logros`);
+  },
   actualizarProgreso(jugadorId, logroId) {
     return request(`/api/progreso/actualizar/${jugadorId}/${logroId}`, {
       method: 'PUT',

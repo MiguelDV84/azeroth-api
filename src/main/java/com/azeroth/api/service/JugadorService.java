@@ -4,18 +4,19 @@ import com.azeroth.api.dto.*;
 import com.azeroth.api.entity.*;
 import com.azeroth.api.enums.ErrorCode;
 import com.azeroth.api.enums.EstadoLogro;
+import com.azeroth.api.enums.Role;
 import com.azeroth.api.exception.BussinesException;
-import com.azeroth.api.exception.GlobalExceptionHandler;
 import com.azeroth.api.mapper.JugadorLogroMapper;
 import com.azeroth.api.mapper.JugadorMapper;
 import com.azeroth.api.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -36,9 +37,37 @@ public class JugadorService {
     private final IHermandadRepository hermandadRepository;
     private final ILogroRepository logroRepository;
     private final IProgresoRepository progresoRepository;
+    private final IUsuarioRepository usuarioRepository;
+
+        private Usuario getUsuarioAutenticado() {
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                return (Usuario) authentication.getPrincipal();
+        }
+
+        private boolean isAdmin(Usuario usuario) {
+                return usuario != null && usuario.getRole() == Role.ADMIN;
+        }
+
+        private Jugador obtenerJugadorConPermisos(Long id, Usuario usuarioAutenticado) {
+                if (isAdmin(usuarioAutenticado)) {
+                        return jugadorRepository.findById(id)
+                                        .orElseThrow(() -> new BussinesException(
+                                                        "Jugador no encontrado",
+                                                        ErrorCode.JUGADOR_NO_ENCONTRADO
+                                        ));
+                }
+                return jugadorRepository.findByIdAndUsuario(id, usuarioAutenticado)
+                                .orElseThrow(() -> new BussinesException(
+                                                "Jugador no encontrado o no tienes permiso para modificarlo",
+                                                ErrorCode.JUGADOR_NO_ENCONTRADO
+                                ));
+        }
 
     @Transactional
     public Optional<JugadorResponse> guardar(JugadorRequest request) {
+        // Obtener el usuario autenticado
+                Usuario usuarioAutenticado = getUsuarioAutenticado();
+
         Jugador jugador = jugadorMapper.jugadorRequestToJugador(request);
         Clase clase = claseRepository.findById(request.claseId())
                 .orElseThrow(() -> new RuntimeException("Clase no encontrada con id: " + request.claseId()));
@@ -73,6 +102,7 @@ public class JugadorService {
             );
         }
 
+        jugador.setUsuario(usuarioAutenticado);
         jugador.setFaccion(faccion);
         jugador.setClase(clase);
         jugador.setRaza(raza);
@@ -83,25 +113,50 @@ public class JugadorService {
 
     @Transactional(readOnly = true)
     public Page<JugadorResponse> findAll(Pageable pageable) {
-        return jugadorRepository.findAll(pageable)
+        // Obtener el usuario autenticado
+        Usuario usuarioAutenticado = getUsuarioAutenticado();
+
+        if (isAdmin(usuarioAutenticado)) {
+            return jugadorRepository.findAll(pageable)
+                    .map(jugadorMapper::jugadorToJugadorResponse);
+        }
+
+        return jugadorRepository.findByUsuario(usuarioAutenticado, pageable)
                 .map(jugadorMapper::jugadorToJugadorResponse);
     }
 
+    @Transactional(readOnly = true)
     public Optional<JugadorResponse> findById(Long id) {
-        return jugadorRepository.findById(id)
+        // Obtener el usuario autenticado
+        Usuario usuarioAutenticado = getUsuarioAutenticado();
+
+        if (isAdmin(usuarioAutenticado)) {
+            return jugadorRepository.findById(id)
+                    .map(jugadorMapper::jugadorToJugadorResponse);
+        }
+
+        return jugadorRepository.findByIdAndUsuario(id, usuarioAutenticado)
                 .map(jugadorMapper::jugadorToJugadorResponse);
     }
 
 
     @Transactional
     public void eliminar(Long id) {
-        jugadorRepository.deleteById(id);
+        // Obtener el usuario autenticado
+        Usuario usuarioAutenticado = getUsuarioAutenticado();
+
+        Jugador jugador = obtenerJugadorConPermisos(id, usuarioAutenticado);
+
+        jugadorRepository.delete(jugador);
     }
 
     @Transactional
     public Optional<JugadorResponse> editar(Long idJugador, JugadorEditarRequest request) {
-        Jugador jugador = jugadorRepository.findById(idJugador)
-                .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + idJugador));
+        // Obtener el usuario autenticado
+        Usuario usuarioAutenticado = getUsuarioAutenticado();
+
+        Jugador jugador = obtenerJugadorConPermisos(idJugador, usuarioAutenticado);
+
         jugador.setNombre(request.nombre());
         Jugador jugadorActualizado = jugadorRepository.save(jugador);
         return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorActualizado));
@@ -109,8 +164,11 @@ public class JugadorService {
 
     @Transactional
     public Optional<JugadorResponse> asignarHermandad(Long idJugador, JugadorHermandadRequest request) {
-        Jugador jugador = jugadorRepository.findById(idJugador)
-                .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + idJugador));
+        // Obtener el usuario autenticado
+        Usuario usuarioAutenticado = getUsuarioAutenticado();
+
+        Jugador jugador = obtenerJugadorConPermisos(idJugador, usuarioAutenticado);
+
         Hermandad hermandad = hermandadRepository.findById(request.hermandadId())
                 .orElseThrow(() -> new RuntimeException("Hermandad no encontrada con id: " + request.hermandadId()));
 
@@ -129,8 +187,11 @@ public class JugadorService {
 
     @Transactional
     public Optional<JugadorResponse> eliminarHermandad(Long idJugador) {
-        Jugador jugador = jugadorRepository.findById(idJugador)
-                .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + idJugador));
+        // Obtener el usuario autenticado
+        Usuario usuarioAutenticado = getUsuarioAutenticado();
+
+        Jugador jugador = obtenerJugadorConPermisos(idJugador, usuarioAutenticado);
+
         jugador.setHermandad(null);
         Jugador jugadorActualizado = jugadorRepository.save(jugador);
         return Optional.of(jugadorMapper.jugadorToJugadorResponse(jugadorActualizado));
@@ -138,8 +199,10 @@ public class JugadorService {
 
     @Transactional
     public Optional<JugadorResponse> ganarExperiencia(Long jugadorId, BigDecimal cantidadGanada) {
-        Jugador jugador = jugadorRepository.findById(jugadorId)
-                .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + jugadorId));
+        // Obtener el usuario autenticado
+        Usuario usuarioAutenticado = getUsuarioAutenticado();
+
+        Jugador jugador = obtenerJugadorConPermisos(jugadorId, usuarioAutenticado);
 
         jugador.setExperiencia(jugador.getExperiencia().add(cantidadGanada.setScale(0, RoundingMode.DOWN)));
 
@@ -151,8 +214,11 @@ public class JugadorService {
 
     @Transactional
     public Optional<JugadorLogrosResponse> inicializarProgresoParaJugador(Long jugadorId) {
-        Jugador jugador = jugadorRepository.findById(jugadorId)
-                .orElseThrow(() -> new RuntimeException("Jugador no encontrado con id: " + jugadorId));
+        // Obtener el usuario autenticado
+        Usuario usuarioAutenticado = getUsuarioAutenticado();
+
+        Jugador jugador = obtenerJugadorConPermisos(jugadorId, usuarioAutenticado);
+
         List<Logros> todosLosLogros = logroRepository.findAll();
 
         List<Progreso> progresos = todosLosLogros.stream()
@@ -166,6 +232,16 @@ public class JugadorService {
                 .toList();
 
         progresoRepository.saveAll(progresos);
+
+        return Optional.of(jugadorLogroMapper.jugadorToJugadorLogrosResponse(jugador));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<JugadorLogrosResponse> obtenerLogrosJugador(Long jugadorId) {
+        // Obtener el usuario autenticado
+        Usuario usuarioAutenticado = getUsuarioAutenticado();
+
+        Jugador jugador = obtenerJugadorConPermisos(jugadorId, usuarioAutenticado);
 
         return Optional.of(jugadorLogroMapper.jugadorToJugadorLogrosResponse(jugador));
     }

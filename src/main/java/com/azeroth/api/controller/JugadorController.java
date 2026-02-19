@@ -124,4 +124,16 @@ public class JugadorController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
+
+    @GetMapping("/{id}/logros")
+    @Operation(summary = "Obtener logros del jugador", description = "Devuelve todos los logros y su progreso para un jugador específico")
+    @ApiResponse(responseCode = "200", description = "Logros del jugador obtenidos exitosamente",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = JugadorLogrosResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Jugador no encontrado",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    public ResponseEntity<JugadorLogrosResponse> obtenerLogrosJugador(@Parameter(description = "ID del jugador", required = true, example = "1") @PathVariable Long id) {
+        return jugadorService.obtenerLogrosJugador(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
 }

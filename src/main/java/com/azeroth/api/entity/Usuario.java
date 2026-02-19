@@ -41,6 +41,9 @@ public class Usuario implements UserDetails {
     @Builder.Default
     private boolean enabled = true;
 
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Jugador> jugadores;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));

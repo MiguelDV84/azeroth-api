@@ -38,11 +38,11 @@ public class Progreso {
     @Column(name = "fecha_completado")
     private LocalDate fechaCompletado;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "jugador_id", nullable = false)
     private Jugador jugador;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "logro_id", nullable = false)
     private Logros logro;
 }

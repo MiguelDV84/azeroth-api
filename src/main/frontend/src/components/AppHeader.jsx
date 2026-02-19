@@ -1,13 +1,17 @@
+import { NavLink } from 'react-router-dom';
+
 const NAV_ITEMS = [
-  { id: 'inicio', label: 'Inicio' },
-  { id: 'forja', label: 'Forja de héroes' },
-  { id: 'viaje', label: 'Viaje del héroe' },
-  { id: 'hermandades', label: 'Hermandades' },
-  { id: 'logros', label: 'Logros' },
-  { id: 'razas', label: 'Archivo de razas' },
+  { id: 'inicio', label: 'Inicio', path: '/' },
+  { id: 'forja', label: 'Forja de héroes', path: '/forja' },
+  { id: 'viaje', label: 'Viaje del héroe', path: '/viaje' },
+  { id: 'hermandades', label: 'Hermandades', path: '/hermandades' },
+  { id: 'logros', label: 'Logros', path: '/logros' },
+  { id: 'razas', label: 'Archivo de razas', path: '/razas', adminOnly: true },
 ];
 
-function AppHeader({ activeView, onNavigate, isAuthenticated, userLabel, onLogout }) {
+function AppHeader({ isAuthenticated, userLabel, onLogout, isAdmin }) {
+  const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
+
   return (
     <header className="app-header">
       <div className="app-header-inner container">
@@ -20,15 +24,15 @@ function AppHeader({ activeView, onNavigate, isAuthenticated, userLabel, onLogou
         </div>
         {isAuthenticated ? (
           <nav className="app-nav" aria-label="Navegación principal">
-            {NAV_ITEMS.map((item) => (
-              <button
+            {visibleItems.map((item) => (
+              <NavLink
                 key={item.id}
-                type="button"
-                className={`nav-link ${activeView === item.id ? 'active' : ''}`}
-                onClick={() => onNavigate(item.id)}
+                to={item.path}
+                end={item.path === '/'}
+                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
               >
                 {item.label}
-              </button>
+              </NavLink>
             ))}
           </nav>
         ) : null}

@@ -3,7 +3,7 @@ import { formatEnum } from '../lib/format';
 
 const isCompleted = (estado) => estado === 'COMPLETADO';
 
-function AchievementProgress({ players, onInitLogros, onAdvanceLogro }) {
+function AchievementProgress({ players, onInitLogros, onLoadLogros, onAdvanceLogro }) {
   const [playerId, setPlayerId] = useState('');
   const [logros, setLogros] = useState([]);
   const [status, setStatus] = useState({ type: '', message: '' });
@@ -20,11 +20,30 @@ function AchievementProgress({ players, onInitLogros, onAdvanceLogro }) {
 
     try {
       setIsLoading(true);
-      const data = await onInitLogros(Number(playerId));
+      const data = await onLoadLogros(Number(playerId));
       setLogros(data.logros || []);
       setStatus({ type: 'success', message: 'Logros cargados correctamente.' });
     } catch (error) {
       setStatus({ type: 'error', message: error.message || 'No se pudieron cargar los logros.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInitLogros = async () => {
+    resetStatus();
+    if (!playerId) {
+      setStatus({ type: 'error', message: 'Selecciona un héroe para inicializar sus logros.' });
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const data = await onInitLogros(Number(playerId));
+      setLogros(data.logros || []);
+      setStatus({ type: 'success', message: 'Logros inicializados correctamente.' });
+    } catch (error) {
+      setStatus({ type: 'error', message: error.message || 'No se pudieron inicializar los logros.' });
     } finally {
       setIsLoading(false);
     }
@@ -67,9 +86,14 @@ function AchievementProgress({ players, onInitLogros, onAdvanceLogro }) {
               </option>
             ))}
           </select>
-          <button type="button" onClick={handleLoadLogros} disabled={isLoading}>
-            {isLoading ? 'Cargando...' : 'Cargar logros'}
-          </button>
+          <div className="button-row">
+            <button type="button" onClick={handleLoadLogros} disabled={isLoading}>
+              {isLoading ? 'Cargando...' : 'Ver logros'}
+            </button>
+            <button type="button" onClick={handleInitLogros} disabled={isLoading}>
+              {isLoading ? 'Inicializando...' : 'Inicializar logros'}
+            </button>
+          </div>
         </div>
       </div>
 

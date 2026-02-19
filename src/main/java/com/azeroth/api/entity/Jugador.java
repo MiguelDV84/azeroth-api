@@ -40,6 +40,10 @@ public class Jugador {
     private BigDecimal experiencia = BigDecimal.ZERO.setScale(0, RoundingMode.DOWN);
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hermandad_id")
     private Hermandad hermandad;
 

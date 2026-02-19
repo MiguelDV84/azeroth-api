@@ -5,12 +5,15 @@ import com.azeroth.api.enums.Clases;
 import com.azeroth.api.enums.Facciones;
 import com.azeroth.api.enums.Razas;
 import com.azeroth.api.enums.Reino;
+import com.azeroth.api.enums.Role;
 import com.azeroth.api.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,6 +24,7 @@ public class DataInitializer {
     private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
 
     @Bean
+    @Order(1)
     CommandLineRunner initClases(IClaseRepository claseRepository) {
         return args -> {
             // Verifica si ya existen datos
@@ -42,6 +46,7 @@ public class DataInitializer {
     }
 
     @Bean
+    @Order(2)
     CommandLineRunner initFaccion(IFaccionRepository faccionRepository) {
         return args -> {
             if(faccionRepository.count() == 0) {
@@ -61,6 +66,7 @@ public class DataInitializer {
     }
 
     @Bean
+    @Order(3)
     CommandLineRunner initRazas(IRazaRepository razaRepository, IFaccionRepository faccionRepository, IClaseRepository claseRepository) {
         return args -> {
             if(razaRepository.count() == 0) {
@@ -93,6 +99,7 @@ public class DataInitializer {
     }
 
     @Bean
+    @Order(4)
     CommandLineRunner initLogros(ILogroRepository logroRepository) {
         return args -> {
             if (logroRepository.count() == 0) {
@@ -713,6 +720,7 @@ public class DataInitializer {
     }
 
     @Bean
+    @Order(5)
     CommandLineRunner initHermandades(IHermandadRepository hermandadRepository, IFaccionRepository faccionRepository) {
         return args -> {
             if (hermandadRepository.count() == 0) {
@@ -737,62 +745,108 @@ public class DataInitializer {
     }
 
     @Bean
+    @Order(6)
+    CommandLineRunner initUsuarios(IUsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+        return args -> {
+            if (usuarioRepository.count() == 0) {
+                logger.info("Iniciando carga de datos de usuarios...");
+                usuarioRepository.saveAll(List.of(
+                        Usuario.builder()
+                                .username("admin")
+                                .password(passwordEncoder.encode("admin123"))
+                                .email("admin@azeroth.com")
+                                .role(Role.ADMIN)
+                                .enabled(true)
+                                .build(),
+                        Usuario.builder()
+                                .username("player1")
+                                .password(passwordEncoder.encode("player123"))
+                                .email("player1@azeroth.com")
+                                .role(Role.USER)
+                                .enabled(true)
+                                .build(),
+                        Usuario.builder()
+                                .username("player2")
+                                .password(passwordEncoder.encode("player123"))
+                                .email("player2@azeroth.com")
+                                .role(Role.USER)
+                                .enabled(true)
+                                .build()
+                ));
+                logger.info("3 usuarios cargados exitosamente");
+            } else {
+                logger.info("Los datos de usuarios ya existen, omitiendo inicialización");
+            }
+        };
+    }
+
+    @Bean
+    @Order(7)
     CommandLineRunner initJugadores(IJugadorRepository jugadorRepository, IHermandadRepository hermandadRepository,
-                                     IFaccionRepository faccionRepository, IRazaRepository razaRepository, IClaseRepository claseRepository) {
+                                     IFaccionRepository faccionRepository, IRazaRepository razaRepository,
+                                     IClaseRepository claseRepository, IUsuarioRepository usuarioRepository) {
         return args -> {
             if (jugadorRepository.count() == 0) {
                 logger.info("Iniciando carga de datos de jugadores...");
+
+                // Obtener usuarios
+                Usuario admin = usuarioRepository.findByUsername("admin").orElseThrow();
+                Usuario player1 = usuarioRepository.findByUsername("player1").orElseThrow();
+                Usuario player2 = usuarioRepository.findByUsername("player2").orElseThrow();
+
                 jugadorRepository.saveAll(List.of(
-                        Jugador.builder().nombre("Arthas").nivel(70).experiencia(BigDecimal.valueOf(8500)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).hermandad(hermandadRepository.findById(1L).orElse(null)).build(),
-                        Jugador.builder().nombre("Jaina").nivel(68).experiencia(BigDecimal.valueOf(7200)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(2L).orElseThrow()).hermandad(hermandadRepository.findById(2L).orElse(null)).build(),
-                        Jugador.builder().nombre("Uther").nivel(70).experiencia(BigDecimal.valueOf(9000)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).hermandad(hermandadRepository.findById(1L).orElse(null)).build(),
-                        Jugador.builder().nombre("Tyrion").nivel(65).experiencia(BigDecimal.valueOf(5500)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).build(),
-                        Jugador.builder().nombre("Malfurion").nivel(70).experiencia(BigDecimal.valueOf(8800)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(3L).orElseThrow()).clase(claseRepository.findById(8L).orElseThrow()).hermandad(hermandadRepository.findById(3L).orElse(null)).build(),
-                        Jugador.builder().nombre("Tyrande").nivel(67).experiencia(BigDecimal.valueOf(6700)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(3L).orElseThrow()).clase(claseRepository.findById(9L).orElseThrow()).hermandad(hermandadRepository.findById(3L).orElse(null)).build(),
-                        Jugador.builder().nombre("Varian").nivel(70).experiencia(BigDecimal.valueOf(9500)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(1L).orElse(null)).build(),
-                        Jugador.builder().nombre("Anduin").nivel(55).experiencia(BigDecimal.valueOf(4200)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(9L).orElseThrow()).hermandad(hermandadRepository.findById(4L).orElse(null)).build(),
-                        Jugador.builder().nombre("Turalyon").nivel(70).experiencia(BigDecimal.valueOf(8900)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).hermandad(hermandadRepository.findById(1L).orElse(null)).build(),
-                        Jugador.builder().nombre("Alleria").nivel(66).experiencia(BigDecimal.valueOf(6100)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(3L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).build(),
-                        Jugador.builder().nombre("Khadgar").nivel(70).experiencia(BigDecimal.valueOf(9200)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(2L).orElseThrow()).hermandad(hermandadRepository.findById(2L).orElse(null)).build(),
-                        Jugador.builder().nombre("Medivh").nivel(70).experiencia(BigDecimal.valueOf(9800)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(2L).orElseThrow()).build(),
-                        Jugador.builder().nombre("Magni").nivel(68).experiencia(BigDecimal.valueOf(7500)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(4L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(5L).orElse(null)).build(),
-                        Jugador.builder().nombre("Muradin").nivel(65).experiencia(BigDecimal.valueOf(5800)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(4L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(5L).orElse(null)).build(),
-                        Jugador.builder().nombre("Brann").nivel(60).experiencia(BigDecimal.valueOf(4800)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(4L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).build(),
-                        Jugador.builder().nombre("Gelbin").nivel(62).experiencia(BigDecimal.valueOf(5200)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(6L).orElseThrow()).clase(claseRepository.findById(2L).orElseThrow()).hermandad(hermandadRepository.findById(2L).orElse(null)).build(),
-                        Jugador.builder().nombre("Kurdran").nivel(64).experiencia(BigDecimal.valueOf(5600)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(4L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).hermandad(hermandadRepository.findById(4L).orElse(null)).build(),
-                        Jugador.builder().nombre("Falstad").nivel(66).experiencia(BigDecimal.valueOf(6300)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(4L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).build(),
-                        Jugador.builder().nombre("Velen").nivel(70).experiencia(BigDecimal.valueOf(9100)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(9L).orElseThrow()).clase(claseRepository.findById(9L).orElseThrow()).hermandad(hermandadRepository.findById(3L).orElse(null)).build(),
-                        Jugador.builder().nombre("Maraad").nivel(68).experiencia(BigDecimal.valueOf(7400)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(9L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).hermandad(hermandadRepository.findById(1L).orElse(null)).build(),
-                        Jugador.builder().nombre("Yrel").nivel(65).experiencia(BigDecimal.valueOf(5900)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(9L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).build(),
-                        Jugador.builder().nombre("Nobundo").nivel(63).experiencia(BigDecimal.valueOf(5400)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(9L).orElseThrow()).clase(claseRepository.findById(5L).orElseThrow()).hermandad(hermandadRepository.findById(5L).orElse(null)).build(),
-                        Jugador.builder().nombre("Bolvar").nivel(70).experiencia(BigDecimal.valueOf(8700)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).hermandad(hermandadRepository.findById(4L).orElse(null)).build(),
-                        Jugador.builder().nombre("Tirion").nivel(70).experiencia(BigDecimal.valueOf(9300)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).build(),
-                        Jugador.builder().nombre("Darion").nivel(67).experiencia(BigDecimal.valueOf(6800)).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(1L).orElse(null)).build(),
-                        Jugador.builder().nombre("Thrall").nivel(70).experiencia(BigDecimal.valueOf(9600)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(5L).orElseThrow()).hermandad(hermandadRepository.findById(6L).orElse(null)).build(),
-                        Jugador.builder().nombre("Grom").nivel(70).experiencia(BigDecimal.valueOf(9400)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(6L).orElse(null)).build(),
-                        Jugador.builder().nombre("Durotan").nivel(68).experiencia(BigDecimal.valueOf(7600)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).build(),
-                        Jugador.builder().nombre("Orgrim").nivel(69).experiencia(BigDecimal.valueOf(8000)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(7L).orElse(null)).build(),
-                        Jugador.builder().nombre("Garrosh").nivel(70).experiencia(BigDecimal.valueOf(9700)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(9L).orElse(null)).build(),
-                        Jugador.builder().nombre("Saurfang").nivel(70).experiencia(BigDecimal.valueOf(9500)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(6L).orElse(null)).build(),
-                        Jugador.builder().nombre("Rexxar").nivel(67).experiencia(BigDecimal.valueOf(6900)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).build(),
-                        Jugador.builder().nombre("Rokhan").nivel(65).experiencia(BigDecimal.valueOf(5700)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(8L).orElseThrow()).clase(claseRepository.findById(5L).orElseThrow()).hermandad(hermandadRepository.findById(10L).orElse(null)).build(),
-                        Jugador.builder().nombre("Voljin").nivel(70).experiencia(BigDecimal.valueOf(9000)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(8L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).hermandad(hermandadRepository.findById(10L).orElse(null)).build(),
-                        Jugador.builder().nombre("Cairne").nivel(70).experiencia(BigDecimal.valueOf(8800)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(5L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(10L).orElse(null)).build(),
-                        Jugador.builder().nombre("Baine").nivel(66).experiencia(BigDecimal.valueOf(6200)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(5L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(10L).orElse(null)).build(),
-                        Jugador.builder().nombre("Hamuul").nivel(68).experiencia(BigDecimal.valueOf(7300)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(5L).orElseThrow()).clase(claseRepository.findById(8L).orElseThrow()).build(),
-                        Jugador.builder().nombre("Sylvanas").nivel(70).experiencia(BigDecimal.valueOf(9900)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(7L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).hermandad(hermandadRepository.findById(8L).orElse(null)).build(),
-                        Jugador.builder().nombre("Nathanos").nivel(68).experiencia(BigDecimal.valueOf(7800)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(7L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).hermandad(hermandadRepository.findById(8L).orElse(null)).build(),
-                        Jugador.builder().nombre("Lorthemar").nivel(69).experiencia(BigDecimal.valueOf(8100)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(10L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).hermandad(hermandadRepository.findById(7L).orElse(null)).build(),
-                        Jugador.builder().nombre("Kael").nivel(70).experiencia(BigDecimal.valueOf(9400)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(10L).orElseThrow()).clase(claseRepository.findById(2L).orElseThrow()).build(),
-                        Jugador.builder().nombre("Rommath").nivel(67).experiencia(BigDecimal.valueOf(6600)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(10L).orElseThrow()).clase(claseRepository.findById(2L).orElseThrow()).hermandad(hermandadRepository.findById(9L).orElse(null)).build(),
-                        Jugador.builder().nombre("Zul").nivel(68).experiencia(BigDecimal.valueOf(7100)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(8L).orElseThrow()).clase(claseRepository.findById(2L).orElseThrow()).hermandad(hermandadRepository.findById(6L).orElse(null)).build(),
-                        Jugador.builder().nombre("Rastha").nivel(64).experiencia(BigDecimal.valueOf(5500)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(8L).orElseThrow()).clase(claseRepository.findById(5L).orElseThrow()).build(),
-                        Jugador.builder().nombre("Eitrigg").nivel(66).experiencia(BigDecimal.valueOf(6400)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(7L).orElse(null)).build(),
-                        Jugador.builder().nombre("Nazgrel").nivel(65).experiencia(BigDecimal.valueOf(5800)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).build(),
-                        Jugador.builder().nombre("Drek").nivel(63).experiencia(BigDecimal.valueOf(5300)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(9L).orElse(null)).build(),
-                        Jugador.builder().nombre("Thura").nivel(62).experiencia(BigDecimal.valueOf(5100)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(6L).orElse(null)).build(),
-                        Jugador.builder().nombre("Aggra").nivel(67).experiencia(BigDecimal.valueOf(6700)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(5L).orElseThrow()).hermandad(hermandadRepository.findById(6L).orElse(null)).build(),
-                        Jugador.builder().nombre("Draka").nivel(64).experiencia(BigDecimal.valueOf(5600)).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).build()
+                        Jugador.builder().nombre("Arthas").nivel(70).experiencia(BigDecimal.valueOf(8500)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).hermandad(hermandadRepository.findById(1L).orElse(null)).build(),
+                        Jugador.builder().nombre("Jaina").nivel(68).experiencia(BigDecimal.valueOf(7200)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(2L).orElseThrow()).hermandad(hermandadRepository.findById(2L).orElse(null)).build(),
+                        Jugador.builder().nombre("Uther").nivel(70).experiencia(BigDecimal.valueOf(9000)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).hermandad(hermandadRepository.findById(1L).orElse(null)).build(),
+                        Jugador.builder().nombre("Tyrion").nivel(65).experiencia(BigDecimal.valueOf(5500)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).build(),
+                        Jugador.builder().nombre("Malfurion").nivel(70).experiencia(BigDecimal.valueOf(8800)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(3L).orElseThrow()).clase(claseRepository.findById(8L).orElseThrow()).hermandad(hermandadRepository.findById(3L).orElse(null)).build(),
+                        Jugador.builder().nombre("Tyrande").nivel(67).experiencia(BigDecimal.valueOf(6700)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(3L).orElseThrow()).clase(claseRepository.findById(9L).orElseThrow()).hermandad(hermandadRepository.findById(3L).orElse(null)).build(),
+                        Jugador.builder().nombre("Varian").nivel(70).experiencia(BigDecimal.valueOf(9500)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(1L).orElse(null)).build(),
+                        Jugador.builder().nombre("Anduin").nivel(55).experiencia(BigDecimal.valueOf(4200)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(9L).orElseThrow()).hermandad(hermandadRepository.findById(4L).orElse(null)).build(),
+                        Jugador.builder().nombre("Turalyon").nivel(70).experiencia(BigDecimal.valueOf(8900)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).hermandad(hermandadRepository.findById(1L).orElse(null)).build(),
+                        Jugador.builder().nombre("Alleria").nivel(66).experiencia(BigDecimal.valueOf(6100)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(3L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).build(),
+                        Jugador.builder().nombre("Khadgar").nivel(70).experiencia(BigDecimal.valueOf(9200)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(2L).orElseThrow()).hermandad(hermandadRepository.findById(2L).orElse(null)).build(),
+                        Jugador.builder().nombre("Medivh").nivel(70).experiencia(BigDecimal.valueOf(9800)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(2L).orElseThrow()).build(),
+                        Jugador.builder().nombre("Magni").nivel(68).experiencia(BigDecimal.valueOf(7500)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(4L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(5L).orElse(null)).build(),
+                        Jugador.builder().nombre("Muradin").nivel(65).experiencia(BigDecimal.valueOf(5800)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(4L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(5L).orElse(null)).build(),
+                        Jugador.builder().nombre("Brann").nivel(60).experiencia(BigDecimal.valueOf(4800)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(4L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).build(),
+                        Jugador.builder().nombre("Gelbin").nivel(62).experiencia(BigDecimal.valueOf(5200)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(6L).orElseThrow()).clase(claseRepository.findById(2L).orElseThrow()).hermandad(hermandadRepository.findById(2L).orElse(null)).build(),
+                        Jugador.builder().nombre("Kurdran").nivel(64).experiencia(BigDecimal.valueOf(5600)).usuario(admin).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(4L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).hermandad(hermandadRepository.findById(4L).orElse(null)).build(),
+                        // Jugadores para player1 (17 jugadores)
+                        Jugador.builder().nombre("Falstad").nivel(66).experiencia(BigDecimal.valueOf(6300)).usuario(player1).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(4L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).build(),
+                        Jugador.builder().nombre("Velen").nivel(70).experiencia(BigDecimal.valueOf(9100)).usuario(player1).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(9L).orElseThrow()).clase(claseRepository.findById(9L).orElseThrow()).hermandad(hermandadRepository.findById(3L).orElse(null)).build(),
+                        Jugador.builder().nombre("Maraad").nivel(68).experiencia(BigDecimal.valueOf(7400)).usuario(player1).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(9L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).hermandad(hermandadRepository.findById(1L).orElse(null)).build(),
+                        Jugador.builder().nombre("Yrel").nivel(65).experiencia(BigDecimal.valueOf(5900)).usuario(player1).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(9L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).build(),
+                        Jugador.builder().nombre("Nobundo").nivel(63).experiencia(BigDecimal.valueOf(5400)).usuario(player1).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(9L).orElseThrow()).clase(claseRepository.findById(5L).orElseThrow()).hermandad(hermandadRepository.findById(5L).orElse(null)).build(),
+                        Jugador.builder().nombre("Bolvar").nivel(70).experiencia(BigDecimal.valueOf(8700)).usuario(player1).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).hermandad(hermandadRepository.findById(4L).orElse(null)).build(),
+                        Jugador.builder().nombre("Tirion").nivel(70).experiencia(BigDecimal.valueOf(9300)).usuario(player1).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).build(),
+                        Jugador.builder().nombre("Darion").nivel(67).experiencia(BigDecimal.valueOf(6800)).usuario(player1).faccion(faccionRepository.findByNombre(Facciones.ALIANZA).orElseThrow()).raza(razaRepository.findById(1L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(1L).orElse(null)).build(),
+                        Jugador.builder().nombre("Thrall").nivel(70).experiencia(BigDecimal.valueOf(9600)).usuario(player1).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(5L).orElseThrow()).hermandad(hermandadRepository.findById(6L).orElse(null)).build(),
+                        Jugador.builder().nombre("Grom").nivel(70).experiencia(BigDecimal.valueOf(9400)).usuario(player1).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(6L).orElse(null)).build(),
+                        Jugador.builder().nombre("Durotan").nivel(68).experiencia(BigDecimal.valueOf(7600)).usuario(player1).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).build(),
+                        Jugador.builder().nombre("Orgrim").nivel(69).experiencia(BigDecimal.valueOf(8000)).usuario(player1).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(7L).orElse(null)).build(),
+                        Jugador.builder().nombre("Garrosh").nivel(70).experiencia(BigDecimal.valueOf(9700)).usuario(player1).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(9L).orElse(null)).build(),
+                        Jugador.builder().nombre("Saurfang").nivel(70).experiencia(BigDecimal.valueOf(9500)).usuario(player1).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(6L).orElse(null)).build(),
+                        // Jugadores para player2 (16 jugadores restantes)
+                        Jugador.builder().nombre("Rexxar").nivel(67).experiencia(BigDecimal.valueOf(6900)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).build(),
+                        Jugador.builder().nombre("Rokhan").nivel(65).experiencia(BigDecimal.valueOf(5700)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(8L).orElseThrow()).clase(claseRepository.findById(5L).orElseThrow()).hermandad(hermandadRepository.findById(10L).orElse(null)).build(),
+                        Jugador.builder().nombre("Voljin").nivel(70).experiencia(BigDecimal.valueOf(9000)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(8L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).hermandad(hermandadRepository.findById(10L).orElse(null)).build(),
+                        Jugador.builder().nombre("Cairne").nivel(70).experiencia(BigDecimal.valueOf(8800)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(5L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(10L).orElse(null)).build(),
+                        Jugador.builder().nombre("Baine").nivel(66).experiencia(BigDecimal.valueOf(6200)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(5L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(10L).orElse(null)).build(),
+                        Jugador.builder().nombre("Hamuul").nivel(68).experiencia(BigDecimal.valueOf(7300)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(5L).orElseThrow()).clase(claseRepository.findById(8L).orElseThrow()).build(),
+                        Jugador.builder().nombre("Sylvanas").nivel(70).experiencia(BigDecimal.valueOf(9900)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(7L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).hermandad(hermandadRepository.findById(8L).orElse(null)).build(),
+                        Jugador.builder().nombre("Nathanos").nivel(68).experiencia(BigDecimal.valueOf(7800)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(7L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).hermandad(hermandadRepository.findById(8L).orElse(null)).build(),
+                        Jugador.builder().nombre("Lorthemar").nivel(69).experiencia(BigDecimal.valueOf(8100)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(10L).orElseThrow()).clase(claseRepository.findById(7L).orElseThrow()).hermandad(hermandadRepository.findById(7L).orElse(null)).build(),
+                        Jugador.builder().nombre("Kael").nivel(70).experiencia(BigDecimal.valueOf(9400)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(10L).orElseThrow()).clase(claseRepository.findById(2L).orElseThrow()).build(),
+                        Jugador.builder().nombre("Rommath").nivel(67).experiencia(BigDecimal.valueOf(6600)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(10L).orElseThrow()).clase(claseRepository.findById(2L).orElseThrow()).hermandad(hermandadRepository.findById(9L).orElse(null)).build(),
+                        Jugador.builder().nombre("Zul").nivel(68).experiencia(BigDecimal.valueOf(7100)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(8L).orElseThrow()).clase(claseRepository.findById(2L).orElseThrow()).hermandad(hermandadRepository.findById(6L).orElse(null)).build(),
+                        Jugador.builder().nombre("Rastha").nivel(64).experiencia(BigDecimal.valueOf(5500)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(8L).orElseThrow()).clase(claseRepository.findById(5L).orElseThrow()).build(),
+                        Jugador.builder().nombre("Eitrigg").nivel(66).experiencia(BigDecimal.valueOf(6400)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(7L).orElse(null)).build(),
+                        Jugador.builder().nombre("Nazgrel").nivel(65).experiencia(BigDecimal.valueOf(5800)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).build(),
+                        Jugador.builder().nombre("Drek").nivel(63).experiencia(BigDecimal.valueOf(5300)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(9L).orElse(null)).build(),
+                        Jugador.builder().nombre("Thura").nivel(62).experiencia(BigDecimal.valueOf(5100)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(1L).orElseThrow()).hermandad(hermandadRepository.findById(6L).orElse(null)).build(),
+                        Jugador.builder().nombre("Aggra").nivel(67).experiencia(BigDecimal.valueOf(6700)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(5L).orElseThrow()).hermandad(hermandadRepository.findById(6L).orElse(null)).build(),
+                        Jugador.builder().nombre("Draka").nivel(64).experiencia(BigDecimal.valueOf(5600)).usuario(player2).faccion(faccionRepository.findByNombre(Facciones.HORDA).orElseThrow()).raza(razaRepository.findById(2L).orElseThrow()).clase(claseRepository.findById(4L).orElseThrow()).build()
                 ));
                 logger.info("50 jugadores cargados exitosamente");
             } else {

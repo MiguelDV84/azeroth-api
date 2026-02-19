@@ -15,6 +15,7 @@ function GuildHall({
   onJoinGuild,
   onRefreshGuilds,
   onRefreshPlayers,
+  canDisband,
 }) {
   const [guildId, setGuildId] = useState('');
   const [guildDetail, setGuildDetail] = useState(null);
@@ -81,6 +82,10 @@ function GuildHall({
 
   const handleDelete = async () => {
     resetStatus();
+    if (!canDisband) {
+      setStatus({ type: 'error', message: 'No tienes permisos para disolver hermandades.' });
+      return;
+    }
     if (!guildId) return;
     try {
       await onDeleteGuild(Number(guildId));
@@ -170,7 +175,12 @@ function GuildHall({
       <div className="button-row">
         <button type="button" onClick={handleCreate}>Fundar hermandad</button>
         <button type="button" onClick={handleUpdate} disabled={!guildId}>Actualizar</button>
-        <button type="button" className="danger" onClick={handleDelete} disabled={!guildId}>
+        <button
+          type="button"
+          className="danger"
+          onClick={handleDelete}
+          disabled={!guildId || !canDisband}
+        >
           Disolver
         </button>
       </div>

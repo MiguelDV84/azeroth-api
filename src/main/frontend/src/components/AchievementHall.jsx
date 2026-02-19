@@ -6,12 +6,14 @@ function AchievementHall({
   players,
   logros,
   onInitLogros,
+  onLoadLogros,
   onAdvanceLogro,
   onLoadLogro,
   onCreateLogro,
   onUpdateLogro,
   onDeleteLogro,
   onRefreshLogros,
+  isAdmin,
 }) {
   const [logroId, setLogroId] = useState('');
   const [logroDetail, setLogroDetail] = useState(null);
@@ -91,71 +93,74 @@ function AchievementHall({
       <AchievementProgress
         players={players}
         onInitLogros={onInitLogros}
+        onLoadLogros={onLoadLogros}
         onAdvanceLogro={onAdvanceLogro}
       />
 
-      <div className="card logros-library">
-        <h3>Tablón de logros</h3>
-        <p className="muted">Consulta y registra nuevas hazañas para Azeroth.</p>
+      {isAdmin ? (
+        <div className="card logros-library">
+          <h3>Tablón de logros</h3>
+          <p className="muted">Consulta y registra nuevas hazañas para Azeroth.</p>
 
-        <div className="form-grid">
-          <label className="form-field">
-            <span>Logro</span>
-            <select value={logroId} onChange={(event) => setLogroId(event.target.value)}>
-              <option value="">Selecciona un logro</option>
-              {logros.map((logro) => (
-                <option key={logro.id} value={logro.id}>
-                  {logro.titulo}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button type="button" onClick={loadLogro} disabled={!logroId}>
-            Consultar
-          </button>
-        </div>
-
-        {status.message ? (
-          <div className={`${status.type}-message mt-2`}>{status.message}</div>
-        ) : null}
-
-        {logroDetail ? (
-          <div className="logro-detail mt-2">
-            <h4>{logroDetail.titulo}</h4>
-            <p className="muted">{logroDetail.descripcion}</p>
-            <p className="muted">
-              Estado: {formatEnum(logroDetail.estado)} · Objetivo {logroDetail.valorObjetivo}
-            </p>
+          <div className="form-grid">
+            <label className="form-field">
+              <span>Logro</span>
+              <select value={logroId} onChange={(event) => setLogroId(event.target.value)}>
+                <option value="">Selecciona un logro</option>
+                {logros.map((logro) => (
+                  <option key={logro.id} value={logro.id}>
+                    {logro.titulo}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button type="button" onClick={loadLogro} disabled={!logroId}>
+              Consultar
+            </button>
           </div>
-        ) : null}
 
-        <div className="form-grid mt-2">
-          <label className="form-field">
-            <span>Título</span>
-            <input value={titulo} onChange={(event) => setTitulo(event.target.value)} />
-          </label>
-          <label className="form-field">
-            <span>Descripción</span>
-            <input value={descripcion} onChange={(event) => setDescripcion(event.target.value)} />
-          </label>
-          <label className="form-field">
-            <span>Puntos</span>
-            <input type="number" value={puntos} onChange={(event) => setPuntos(event.target.value)} />
-          </label>
-          <label className="form-field">
-            <span>Valor objetivo</span>
-            <input type="number" value={objetivo} onChange={(event) => setObjetivo(event.target.value)} />
-          </label>
-        </div>
+          {status.message ? (
+            <div className={`${status.type}-message mt-2`}>{status.message}</div>
+          ) : null}
 
-        <div className="button-row">
-          <button type="button" onClick={handleCreate}>Registrar logro</button>
-          <button type="button" onClick={handleUpdate} disabled={!logroId}>Actualizar</button>
-          <button type="button" className="danger" onClick={handleDelete} disabled={!logroId}>
-            Eliminar
-          </button>
+          {logroDetail ? (
+            <div className="logro-detail mt-2">
+              <h4>{logroDetail.titulo}</h4>
+              <p className="muted">{logroDetail.descripcion}</p>
+              <p className="muted">
+                Estado: {formatEnum(logroDetail.estado)} · Objetivo {logroDetail.valorObjetivo}
+              </p>
+            </div>
+          ) : null}
+
+          <div className="form-grid mt-2">
+            <label className="form-field">
+              <span>Título</span>
+              <input value={titulo} onChange={(event) => setTitulo(event.target.value)} />
+            </label>
+            <label className="form-field">
+              <span>Descripción</span>
+              <input value={descripcion} onChange={(event) => setDescripcion(event.target.value)} />
+            </label>
+            <label className="form-field">
+              <span>Puntos</span>
+              <input type="number" value={puntos} onChange={(event) => setPuntos(event.target.value)} />
+            </label>
+            <label className="form-field">
+              <span>Valor objetivo</span>
+              <input type="number" value={objetivo} onChange={(event) => setObjetivo(event.target.value)} />
+            </label>
+          </div>
+
+          <div className="button-row">
+            <button type="button" onClick={handleCreate}>Registrar logro</button>
+            <button type="button" onClick={handleUpdate} disabled={!logroId}>Actualizar</button>
+            <button type="button" className="danger" onClick={handleDelete} disabled={!logroId}>
+              Eliminar
+            </button>
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }
