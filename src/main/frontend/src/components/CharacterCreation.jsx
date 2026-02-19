@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { factionTone, formatEnum } from '../lib/format';
+import { useEffect, useMemo, useState } from "react";
+import { factionTone, formatEnum } from "../lib/format";
 
 function CharacterCreation({
   races,
@@ -11,24 +11,26 @@ function CharacterCreation({
   onLoadClass,
   onLoadFaction,
 }) {
-  const [name, setName] = useState('');
-  const [raceId, setRaceId] = useState('');
-  const [classId, setClassId] = useState('');
-  const [factionId, setFactionId] = useState('');
+  const [name, setName] = useState("");
+  const [raceId, setRaceId] = useState("");
+  const [classId, setClassId] = useState("");
+  const [factionId, setFactionId] = useState("");
   const [raceDetail, setRaceDetail] = useState(null);
   const [classDetail, setClassDetail] = useState(null);
   const [factionDetail, setFactionDetail] = useState(null);
-  const [status, setStatus] = useState({ type: '', message: '' });
+  const [status, setStatus] = useState({ type: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedRace = useMemo(
     () => races.find((race) => race.id?.toString() === raceId),
-    [raceId, races]
+    [raceId, races],
   );
 
   const availableClasses = useMemo(() => {
     if (!selectedRace?.clasesDisponibles?.length) return classes;
-    return classes.filter((clase) => selectedRace.clasesDisponibles.includes(clase.nombre));
+    return classes.filter((clase) =>
+      selectedRace.clasesDisponibles.includes(clase.nombre),
+    );
   }, [classes, selectedRace]);
 
   useEffect(() => {
@@ -54,7 +56,9 @@ function CharacterCreation({
 
   useEffect(() => {
     if (!selectedRace) return;
-    const matchingFaction = factions.find((faction) => faction.nombre === selectedRace.faccion);
+    const matchingFaction = factions.find(
+      (faction) => faction.nombre === selectedRace.faccion,
+    );
     if (matchingFaction && matchingFaction.id?.toString() !== factionId) {
       setFactionId(matchingFaction.id.toString());
     }
@@ -62,20 +66,25 @@ function CharacterCreation({
 
   useEffect(() => {
     if (!classId) return;
-    const stillAvailable = availableClasses.some((clase) => clase.id?.toString() === classId);
+    const stillAvailable = availableClasses.some(
+      (clase) => clase.id?.toString() === classId,
+    );
     if (!stillAvailable) {
-      setClassId('');
+      setClassId("");
     }
   }, [availableClasses, classId]);
 
-  const resetStatus = () => setStatus({ type: '', message: '' });
+  const resetStatus = () => setStatus({ type: "", message: "" });
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     resetStatus();
 
     if (!name || !raceId || !classId || !factionId) {
-      setStatus({ type: 'error', message: 'Completa todos los campos para forjar tu héroe.' });
+      setStatus({
+        type: "error",
+        message: "Completa todos los campos para forjar tu héroe.",
+      });
       return;
     }
 
@@ -87,14 +96,20 @@ function CharacterCreation({
         claseId: Number(classId),
         faccionId: Number(factionId),
       });
-      setStatus({ type: 'success', message: '¡Héroe creado! Tus crónicas han comenzado.' });
-      setName('');
-      setRaceId('');
-      setClassId('');
-      setFactionId('');
+      setStatus({
+        type: "success",
+        message: "¡Héroe creado! Tus crónicas han comenzado.",
+      });
+      setName("");
+      setRaceId("");
+      setClassId("");
+      setFactionId("");
       await onRefreshPlayers();
     } catch (error) {
-      setStatus({ type: 'error', message: error.message || 'No se pudo crear el héroe.' });
+      setStatus({
+        type: "error",
+        message: error.message || "No se pudo crear el héroe.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -104,9 +119,14 @@ function CharacterCreation({
 
   return (
     <div className="grid-two">
-      <form className={`card form-card ${factionClass}`} onSubmit={handleSubmit}>
+      <form
+        className={`card form-card ${factionClass}`}
+        onSubmit={handleSubmit}
+      >
         <h3>Forja del personaje</h3>
-        <p className="muted">Elige tu linaje, tu camino y el estandarte que jurarás proteger.</p>
+        <p className="muted">
+          Elige tu linaje, tu camino y el estandarte que jurarás proteger.
+        </p>
 
         <div className="form-grid">
           <label className="form-field">
@@ -121,7 +141,10 @@ function CharacterCreation({
 
           <label className="form-field">
             <span>Raza</span>
-            <select value={raceId} onChange={(event) => setRaceId(event.target.value)}>
+            <select
+              value={raceId}
+              onChange={(event) => setRaceId(event.target.value)}
+            >
               <option value="">Selecciona una raza</option>
               {races.map((race) => (
                 <option key={race.id} value={race.id}>
@@ -133,7 +156,10 @@ function CharacterCreation({
 
           <label className="form-field">
             <span>Clase</span>
-            <select value={classId} onChange={(event) => setClassId(event.target.value)}>
+            <select
+              value={classId}
+              onChange={(event) => setClassId(event.target.value)}
+            >
               <option value="">Selecciona una clase</option>
               {availableClasses.map((clase) => (
                 <option key={clase.id} value={clase.id}>
@@ -145,7 +171,10 @@ function CharacterCreation({
 
           <label className="form-field">
             <span>Facción</span>
-            <select value={factionId} onChange={(event) => setFactionId(event.target.value)}>
+            <select
+              value={factionId}
+              onChange={(event) => setFactionId(event.target.value)}
+            >
               <option value="">Selecciona facción</option>
               {factions.map((faction) => (
                 <option key={faction.id} value={faction.id}>
@@ -157,7 +186,7 @@ function CharacterCreation({
         </div>
 
         <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Forjando...' : 'Crear héroe'}
+          {isSubmitting ? "Forjando..." : "Crear héroe"}
         </button>
 
         {status.message ? (
@@ -170,37 +199,44 @@ function CharacterCreation({
         <div className="preview-content">
           <div>
             <p className="muted">Nombre</p>
-            <p className="preview-value">{name || 'Sin nombre'}</p>
+            <p className="preview-value">{name || "Sin nombre"}</p>
           </div>
           <div>
             <p className="muted">Raza</p>
-            <p className="preview-value">{formatEnum(selectedRace?.nombre) || 'Sin definir'}</p>
+            <p className="preview-value">
+              {formatEnum(selectedRace?.nombre) || "Sin definir"}
+            </p>
           </div>
           <div>
             <p className="muted">Clase</p>
             <p className="preview-value">
-              {formatEnum(availableClasses.find((clase) => clase.id?.toString() === classId)?.nombre) ||
-                'Sin definir'}
+              {formatEnum(
+                availableClasses.find(
+                  (clase) => clase.id?.toString() === classId,
+                )?.nombre,
+              ) || "Sin definir"}
             </p>
           </div>
           <div>
             <p className="muted">Facción</p>
             <p className={`preview-value ${factionClass}`}>
-              {formatEnum(selectedRace?.faccion) || 'Sin juramento'}
+              {formatEnum(selectedRace?.faccion) || "Sin juramento"}
             </p>
           </div>
         </div>
         <div className="info-stack mt-2">
           {raceDetail ? (
             <p>
-              <strong>Raza:</strong> {formatEnum(raceDetail.nombre)} · Clases disponibles:{' '}
-              {raceDetail.clasesDisponibles?.map(formatEnum).join(', ')}
+              <strong>Raza:</strong> {formatEnum(raceDetail.nombre)} · Clases
+              disponibles:{" "}
+              {raceDetail.clasesDisponibles?.map(formatEnum).join(", ")}
             </p>
           ) : null}
           {classDetail ? (
             <p>
-              <strong>Clase:</strong> {formatEnum(classDetail.nombre)} · Razas disponibles:{' '}
-              {classDetail.razasDisponibles?.map(formatEnum).join(', ')}
+              <strong>Clase:</strong> {formatEnum(classDetail.nombre)} · Razas
+              disponibles:{" "}
+              {classDetail.razasDisponibles?.map(formatEnum).join(", ")}
             </p>
           ) : null}
           {factionDetail ? (

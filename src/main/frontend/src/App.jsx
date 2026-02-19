@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AppHeader from './components/AppHeader';
-import Section from './components/Section';
-import CharacterCreation from './components/CharacterCreation';
-import PlayerRoster from './components/PlayerRoster';
-import PlayerJourney from './components/PlayerJourney';
-import GuildHall from './components/GuildHall';
-import AchievementHall from './components/AchievementHall';
-import RazaArchive from './components/RazaArchive';
 import LoginScreen from './components/LoginScreen';
+import HomePage from './pages/HomePage';
+import ForjaPage from './pages/ForjaPage';
+import ViajePage from './pages/ViajePage';
+import HermandadesPage from './pages/HermandadesPage';
+import LogrosPage from './pages/LogrosPage';
+import RazasPage from './pages/RazasPage';
 import { api, setAuthToken } from './lib/api';
 import './App.css';
 
@@ -150,20 +149,6 @@ function App() {
     setStatus({ type: 'success', message: 'Sesión cerrada.' });
   };
 
-  const HomePage = () => (
-    <Section
-      title="Bienvenido a Azeroth"
-      subtitle="Recorre las vistas para crear héroes, levantar hermandades y alcanzar logros épicos."
-    >
-      <div className="card intro-card">
-        <h3>Tu viaje comienza aquí</h3>
-        <p className="muted">
-          Desde este refugio puedes forjar personajes, explorar su progreso y registrar nuevas hazañas.
-        </p>
-      </div>
-    </Section>
-  );
-
   return (
     <BrowserRouter>
       <div className="app">
@@ -189,109 +174,84 @@ function App() {
               <Route
                 path="/forja"
                 element={
-                  <Section
-                    title="Forja de héroes"
-                    subtitle="Elige tu raza, clase y facción como en las crónicas de Azeroth."
-                  >
-                    <CharacterCreation
-                      races={races}
-                      classes={classes}
-                      factions={factions}
-                      onCreatePlayer={api.createJugador}
-                      onRefreshPlayers={refreshPlayers}
-                      onLoadRace={api.getRazaById}
-                      onLoadClass={api.getClaseById}
-                      onLoadFaction={api.getFaccionById}
-                    />
-                    <PlayerRoster players={players} />
-                  </Section>
+                  <ForjaPage
+                    races={races}
+                    classes={classes}
+                    factions={factions}
+                    players={players}
+                    onCreatePlayer={api.createJugador}
+                    onRefreshPlayers={refreshPlayers}
+                    onLoadRace={api.getRazaById}
+                    onLoadClass={api.getClaseById}
+                    onLoadFaction={api.getFaccionById}
+                  />
                 }
               />
               <Route
                 path="/viaje"
                 element={
-                  <Section
-                    title="Viaje del héroe"
-                    subtitle="Profundiza en el progreso y las decisiones de cada campeón."
-                  >
-                    <PlayerJourney
-                      players={players}
-                      onGetPlayer={api.getJugadorById}
-                      onUpdatePlayer={api.updateJugador}
-                      onDeletePlayer={api.deleteJugador}
-                      onGainExp={api.ganarExperiencia}
-                      onRemoveGuild={api.removerHermandad}
-                      onRefreshPlayers={refreshPlayers}
-                    />
-                  </Section>
+                  <ViajePage
+                    players={players}
+                    onGetPlayer={api.getJugadorById}
+                    onUpdatePlayer={api.updateJugador}
+                    onDeletePlayer={api.deleteJugador}
+                    onGainExp={api.ganarExperiencia}
+                    onRemoveGuild={api.removerHermandad}
+                    onRefreshPlayers={refreshPlayers}
+                  />
                 }
               />
               <Route
                 path="/hermandades"
                 element={
-                  <Section
-                    title="Hermandades"
-                    subtitle="Fundar, consultar y reforzar lazos entre héroes."
-                  >
-                    <GuildHall
-                      guilds={guilds}
-                      factions={factions}
-                      players={players}
-                      onCreateGuild={api.createHermandad}
-                      onUpdateGuild={api.updateHermandad}
-                      onDeleteGuild={api.deleteHermandad}
-                      onGetGuild={api.getHermandadById}
-                      onGetGuildCount={api.getHermandadCantidad}
-                      onJoinGuild={api.asignarHermandad}
-                      onRefreshGuilds={refreshGuilds}
-                      onRefreshPlayers={refreshPlayers}
-                      canDisband={isAdmin}
-                    />
-                  </Section>
+                  <HermandadesPage
+                    guilds={guilds}
+                    factions={factions}
+                    players={players}
+                    onCreateGuild={api.createHermandad}
+                    onUpdateGuild={api.updateHermandad}
+                    onDeleteGuild={api.deleteHermandad}
+                    onGetGuild={api.getHermandadById}
+                    onGetGuildCount={api.getHermandadCantidad}
+                    onJoinGuild={api.asignarHermandad}
+                    onRefreshGuilds={refreshGuilds}
+                    onRefreshPlayers={refreshPlayers}
+                    canDisband={isAdmin}
+                  />
                 }
               />
               <Route
                 path="/logros"
                 element={
-                  <Section
-                    title="Salón de logros"
-                    subtitle="Avanza en el progreso y registra nuevas hazañas."
-                  >
-                    <AchievementHall
-                      players={players}
-                      logros={logros}
-                      onInitLogros={api.inicializarLogros}
-                      onLoadLogros={api.getLogrosJugador}
-                      onAdvanceLogro={api.actualizarProgreso}
-                      onLoadLogro={api.getLogroById}
-                      onCreateLogro={api.createLogro}
-                      onUpdateLogro={api.updateLogro}
-                      onDeleteLogro={api.deleteLogro}
-                      onRefreshLogros={refreshLogros}
-                      isAdmin={isAdmin}
-                    />
-                  </Section>
+                  <LogrosPage
+                    players={players}
+                    logros={logros}
+                    onInitLogros={api.inicializarLogros}
+                    onLoadLogros={api.getLogrosJugador}
+                    onAdvanceLogro={api.actualizarProgreso}
+                    onLoadLogro={api.getLogroById}
+                    onCreateLogro={api.createLogro}
+                    onUpdateLogro={api.updateLogro}
+                    onDeleteLogro={api.deleteLogro}
+                    onRefreshLogros={refreshLogros}
+                    isAdmin={isAdmin}
+                  />
                 }
               />
               <Route
                 path="/razas"
                 element={
                   isAdmin ? (
-                    <Section
-                      title="Archivo de razas"
-                      subtitle="Registra las razas y sus afinidades dentro de Azeroth."
-                    >
-                      <RazaArchive
-                        races={races}
-                        classes={classes}
-                        factions={factions}
-                        onLoadRaza={api.getRazaById}
-                        onCreateRaza={api.createRaza}
-                        onUpdateRaza={api.updateRaza}
-                        onDeleteRaza={api.deleteRaza}
-                        onRefreshRazas={refreshRazas}
-                      />
-                    </Section>
+                    <RazasPage
+                      races={races}
+                      classes={classes}
+                      factions={factions}
+                      onLoadRaza={api.getRazaById}
+                      onCreateRaza={api.createRaza}
+                      onUpdateRaza={api.updateRaza}
+                      onDeleteRaza={api.deleteRaza}
+                      onRefreshRazas={refreshRazas}
+                    />
                   ) : (
                     <Navigate to="/" replace />
                   )
